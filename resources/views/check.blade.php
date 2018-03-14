@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Hello Friend Dev App</title>
+    <title>Companion 2Go</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/check/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -28,7 +28,7 @@
 <body id="mainApp">
 
 <nav class="js_navbar navbar navbar-expand-md navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">Hello Friend Dev App</a>
+    <a class="navbar-brand" href="#">Companion 2Go</a>
     <button class="js_login btn btn-outline-success my-2 mx-2 my-sm-0" >Login</button>
     <button class="js_register btn btn-outline-info my-2 mx-2 my-sm-0" >Register</button>
     <button class="js_profile btn btn-outline-info my-2 mx-2 my-sm-0" >Profile</button>

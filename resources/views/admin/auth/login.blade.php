@@ -6,7 +6,7 @@
     <body class="hold-transition login-page">
         <div class="login-box">
           <div class="login-logo">
-            <a href="../../index2.html"><b>Hello</b>Friend</a>
+            <a href="../../index2.html"><b>Companion</b> 2Go</a>
           </div>
           <!-- /.login-logo -->
           <div class="login-box-body">
