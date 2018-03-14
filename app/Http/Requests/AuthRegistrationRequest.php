@@ -24,22 +24,13 @@ class AuthRegistrationRequest extends Request
     public function rules()
     {
         return [
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
-            'first_name' => 'nullable|string',
-            'last_name' => 'nullable|string',
-            'podcast_id' => 'nullable|exists:podcasts,id',
-            'password_hint' => 'nullable',
-            /*
-            'city' => 'nullable|string',
-            'first_name' => 'nullable|string',
-            'last_name' => 'nullable|string',
-            'company_name' => 'nullable|string',
-            'address' => 'nullable|string',
-            'phone' => 'nullable|string',
-            'zip' => 'nullable|string',
-            'state_id' => 'nullable|exists:states,id',
-            */
+            'password' => 'required|confirmed|min:6',
+            'birth_date' => 'required|string',
+            'home_address' => 'required|string',
+            'is_subscribed' => 'nullable|bool',
         ];
     }
 }

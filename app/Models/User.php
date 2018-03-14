@@ -22,37 +22,12 @@ class User extends Authenticatable
         'password',
         'first_name',
         'last_name',
-        'podcast_id',
-        'password_hint',
-
+        'home_address',
+        'birth_date',
+        'is_subscribed',
         'android_device_token',
         'ios_device_token',
     ];
-
-    //protected $with = ['state'];
-
-    //protected $appends = ['stat'];
-    
-    public static function boot()
-    {
-        parent::boot();
-        
-        self::created(function (User $user) {
-
-            // Seed user with default settings
-            UserSetting::whereNull('user_id')->get()->each(function($setting) use ($user) {
-                UserSetting::create(array_merge(
-                    $setting->toArray(), ['user_id' => $user->id]
-                ));
-            });
-        });
-        
-        self::deleted(function (User $user) {
-
-            // Remove user settings
-            UserSetting::where([ 'user_id' => $user->id, ])->delete();
-        });
-    }
 
     /**
      * The attributes that should be hidden for arrays.
@@ -62,30 +37,6 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function podcast()
-    {
-        return $this->belongsTo('\App\Models\Podcast');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function settings()
-    {
-        return $this->hasMany('\App\Models\UserSetting', 'user_id');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function answers()
-    {
-        return $this->hasMany('\App\Models\Answer');
-    }
 
     public function setPasswordAttribute($value)
     {
