@@ -34,5 +34,21 @@ return [
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
     ],
+    
+    'github' => [
+        'client_id' => env('GITHUB_CLIENT_ID'),         // Your GitHub Client ID
+        'client_secret' => env('GITHUB_CLIENT_SECRET'), // Your GitHub Client Secret
+        'redirect' => 'http://c2go.com:8000',
+    ],
+    
+    'facebook' => [
+//        'client_id' => '1795413764096722',
+//        'client_secret' => 'ae93e7a4981eee0c7c5fef2c7e78f606',
+        
+        // Test
+        'client_id' => '2091364454429443',
+        'client_secret' => '4f3fe3d50ce41ccc04806a01eab4b976',
+        'redirect' => 'http://c2go.com/api/auth/facebook',
+    ],
 
 ];

@@ -83,16 +83,21 @@ class AuthController extends Controller
         return response()->json(compact('token'));
     }
 
+    /**
+     * Check if all required field for registration with email are correct
+     */
+    public function userValidation(Requests\AuthRegistrationRequest $request)
+    {
+        return response()->json(['valid' => true]);
+    }
+    
     public function registration(Requests\AuthRegistrationRequest $request)
     {
         $data = $request->all();
-        //$data['role'] = 'owner';
         $user = User::create($data);
         $token = JWTAuth::fromUser($user);
         $user = User::find($user->id);
         //event(new NotificationEvent($user, 'Add your first broker', ['type' => 'first broker']));
-        //$notifications = Notification::counts($user);
-        //return response()->json(compact('token', 'user', 'notifications'));
         return response()->json(compact('token', 'user'));
     }
 
@@ -118,6 +123,16 @@ class AuthController extends Controller
             $status = false;
         }
         return response()->json(['status' => $status]);
+    }
+    
+    /**
+     * Redirect the user to the GitHub authentication page.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function redirectToProvider(Request $request, $provider)
+    {
+        return Socialite::driver($provider)->redirect();
     }
 
     public function social(Request $request, $provider)
