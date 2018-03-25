@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Middleware\CheckRegCompleteness;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 */
 
 Route::group(['namespace' => 'Api'], function () {
+    
     Route::group(['prefix' => 'auth'], function () {
         Route::post('/login', 'AuthController@login')->name('auth_login');
         Route::post('/user-validation', 'AuthController@userValidation');
@@ -32,27 +33,17 @@ Route::group(['namespace' => 'Api'], function () {
         });
     });
     
-    Route::group(['middleware' => ['jwt.auth',]], function () {
-        Route::get('/check/restricted', 'CheckController@restricted');
-        
-        Route::get('/faq', 'FAQController@index');
-        Route::post('/testimonial', 'TestimonialController@store');
-        
+    Route::group(['middleware' => ['jwt.auth']], function() {
         Route::group(['prefix' => 'user'], function () {
-            Route::group(['prefix' => 'settings'], function () { 
-                Route::get('/', 'SettingsController@show');
-                Route::get('/{section}', 'SettingsController@showSection');
-                Route::get('/key/{key}', 'SettingsController@showByKey');
-                Route::post('/', 'SettingsController@store');
-                Route::put('/{id}', 'SettingsController@update');
-                Route::delete('/{id}', 'SettingsController@destroy');
-            });
-            Route::get('/profile/{id}', 'UserController@publicProfile');
-            Route::resource('answer', 'AnswerController', ['only' => [
-                'index', 'show', 'store',
-            ]]);
+            Route::post('/progress/{progress}', 'UserController@updateProgress');
+            Route::post('/profile-photo', 'UserController@profilePhoto');
+        });
+        Route::group(['middleware' => CheckRegCompleteness::class], function() {
+            Route::get('/dashboard', 'DashboardController@index');
+            Route::get('/check/restricted', 'CheckController@restricted');
+            Route::get('/faq', 'FAQController@index');
+            Route::post('/testimonial', 'TestimonialController@store');
         });
     });
-
 });
 

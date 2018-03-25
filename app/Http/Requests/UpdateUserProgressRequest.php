@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\Request;
-use Illuminate\Support\Facades\Auth;
 
-class UpdateUserSettingsRequest extends Request
+class UpdateUserProgressRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,10 +24,8 @@ class UpdateUserSettingsRequest extends Request
     public function rules()
     {
         return [
-            'section' => 'string|nullable',
-            'key' => 'required|string',
-            'name' => 'nullable|string',
-            'value' => 'required|string',
+            'progress' => 'required|integer|min:2|max:6',
+            'section' => 'nullable|in:location,profile_photo,profile_type',
         ];
     }
 }

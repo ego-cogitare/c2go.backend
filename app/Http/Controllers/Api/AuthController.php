@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api;
 //use App\Events\NotificationEvent;
 use App\Models\Notification;
 use App\Models\User;
+use App\Models\UserSetting;
 use Illuminate\Http\Request;
-
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
@@ -28,21 +28,11 @@ class AuthController extends Controller
             if (!$token = JWTAuth::attempt($credentials, ['is_blocked' => false])) {
                 return response()->json(['error' => 'invalid_credentials'], 401);
             }
-            /** @var User $user */
-            $user = JWTAuth::toUser($token);
-            /*
-            if ($user->role == 'broker' && $user->broker_profile) {
-                $user->broker_profile->is_login = true;
-                $user->broker_profile->save();
-            }
-            */
+            $user = User::with(['settings'])->find(JWTAuth::toUser($token)->id);
         } catch (JWTException $e) {
             return response()->json(['error' => 'could_not_create_token'], 500);
         }
-
-        //$notifications = Notification::counts($user);
-
-        //return response()->json(compact('token', 'user', 'notifications'));
+        
         return response()->json(compact('token', 'user'));
     }
 
@@ -91,12 +81,28 @@ class AuthController extends Controller
         return response()->json(['valid' => true]);
     }
     
+    /**
+     * Registration via email
+     */
     public function registration(Requests\AuthRegistrationRequest $request)
     {
         $data = $request->all();
+        
+        // Set user registration progress to 1 (email needs to be confirmed)
+        $data['progress'] = 2;
+        
+//        Mail::send('emails.confirmation', ['email' => $data['email']], function($message) use($data) {
+//            $message->to($data['email'], 'xxx')
+//                    ->subject('Email confirmaion');
+//        });
+        
         $user = User::create($data);
         $token = JWTAuth::fromUser($user);
-        $user = User::find($user->id);
+        $user = User::with(['settings'])->find($user->id);
+        
+        // Save user location to user settings table
+        UserSetting::location($user->id, $data['location']);
+        
         //event(new NotificationEvent($user, 'Add your first broker', ['type' => 'first broker']));
         return response()->json(compact('token', 'user'));
     }
@@ -150,6 +156,6 @@ class AuthController extends Controller
         return new Response([
             'status' => false,
             'error' => 'Forbidden'
-        ], 404);
+        ], 403);
     }
 }

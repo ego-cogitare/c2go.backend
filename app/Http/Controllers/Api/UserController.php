@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
+use App\Models\UserSetting;
 use App\Models\UserConnection;
 use Illuminate\Http\Request;
 use App\Http\Requests;
@@ -137,61 +138,36 @@ class UserController extends Controller
                 ];
                 $code = 403;
             }
-
         }
 
         return new Response($result, $code);
     }
-
-    public function publicProfile(Request $request, $id) 
+    
+    public function updateProgress(Requests\UpdateUserProgressRequest $request, $progress)
     {
-        $result = [
-            'status' => true,
-        ];
-        $code = 200;
+        Auth::user()->progress = $progress;
+        Auth::user()->save();
         
-        $profile = User::with(['answers' => function($query) use ($id)  {
-            $query->with(['question' => function($query) use ($id)  {
-                $query->with(['question_privacy' => function($query) use ($id) {
-                    $query->with(['users'])->where('user_id', $id);
-                }]);
-            }])
-            ->where('answer_type', 1);
-        }])
-        ->where('id', $id)
-        ->where('is_blocked', 0)
-        ->first();
+        $data = $request->only(['section', 'value']);
         
-        if (!$profile) {
-            $result = [
-                'status' => false,
-                'error' => 'User not found'
-            ];
-            $code = 404;
+        // Save setting
+        if (!empty($data['section'])) {
+            UserSetting::apply(Auth::user()->id, $data['section'], $data['value']);
         }
         
-        // Check if users connected to each other
-        $is_connected = policy($profile)->isConnected($profile, Auth::user());
+        return new Response(['user' => Auth::user()]);
+    }
+    
+    public function profilePhoto(Request $request) 
+    {
+        $path = $request->file('profile-photo')->store('profile-photos');
         
-        $profile = $profile->toArray();
+        // Update user profile photo
+        UserSetting::apply(Auth::user()->id, 'profile_photo', $path);
         
-//        $profile['answers']= array_filter($profile['answers'], function($answer) use ($is_connected) {
-//            switch ($answer['question']['question_privacy']['privacy_level']) {
-//                case 1:
-//                    return true;
-//                break;
-//            }
-////            if ($answer['question']['question_privacy']['privacy_level'] === 1) {
-////                return true;
-////            }
-//                    
-//            return false;
-//        });
-        
-//        dd($profile->toArray());
-        
-        $result['profile'] = $profile;
-        
-        return new Response($result, $code);
+        return response()->json([
+            'status' => true,
+            'user' => User::with(['settings'])->find(Auth::user()->id)
+        ]);
     }
 }

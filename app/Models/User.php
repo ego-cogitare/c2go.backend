@@ -24,6 +24,7 @@ class User extends Authenticatable
         'last_name',
         'home_address',
         'birth_date',
+        'progress',
         'is_subscribed',
         'android_device_token',
         'ios_device_token',
@@ -41,5 +42,10 @@ class User extends Authenticatable
     public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = Hash::make($value);
+    }
+    
+    public function settings()
+    {
+        return $this->hasMany('App\Models\UserSetting');
     }
 }

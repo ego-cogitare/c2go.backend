@@ -31,6 +31,7 @@ class AuthRegistrationRequest extends Request
             'birth_date' => 'required|string',
             'home_address' => 'required|string',
             'is_subscribed' => 'nullable|bool',
+            'location' => 'required|array',
         ];
     }
 }
