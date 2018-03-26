@@ -69,7 +69,7 @@
                 <div class="pull-right hidden-xs">
                     <b>Version</b> 1.0.0
                 </div>
-                <strong>Copyright &copy; {{ date('m.d.Y') }} <a href="http://www.creativebrains.de/" target="_blank">CreativeBrains</a>.</strong> All rights reserved.
+                <strong>Copyright &copy; {{ date('Y') }} <a href="http://www.creativebrains.de/" target="_blank">CreativeBrains</a>.</strong> All rights reserved.
             </footer>
         </div>
         <!-- ./wrapper -->

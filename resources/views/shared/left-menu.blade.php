@@ -6,6 +6,8 @@
             <li class="header">MAIN NAVIGATION</li>
             <li><a href="/admin/admins"><i class="fa fa-user-secret"></i> <span>Admin Users</span></a></li>
             <li><a href="/admin/users"><i class="fa fa-users"></i> <span>Application Users</span></a></li>
+            <li><a href="/admin/categories"><i class="fa fa-list"></i> <span>Categories</span></a></li>
+            <li><a href="/admin/events"><i class="fa fa-ticket"></i> <span>Events</span></a></li>
             <li><a href="/admin/pages"><i class="fa fa-wordpress"></i> <span>Site Pages</span></a></li>
             <li><a href="/admin/faqs"><i class="fa fa-question-circle"></i> <span>FAQs</span></a></li>
             <li><a href="/admin/testimonials"><i class="fa fa-star-half-o"></i> <span>Testimonials</span></a></li>

@@ -29,14 +29,14 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin'], function () {
             Auth::logout();
             return redirect()->intended(route('admin.login'));
         });
-        
         Route::post('/file/upload', 'FileController@upload')->name('admin.file.upload');
-        
         Route::get('/', 'IndexController@index')->name('admin.dashboard');
         Route::get('/report/{type}', 'ReportController@index');
         Route::resource('/pages', 'PagesController');
         Route::resource('/admins', 'AdminsController');
         Route::resource('/users', 'UsersController');
+        Route::resource('/categories', 'CategoriesController');
+        Route::resource('/events', 'EventsController');
         Route::resource('/faqs', 'FAQsController');
         Route::resource('/testimonials', 'TestimonialsController');
     });
