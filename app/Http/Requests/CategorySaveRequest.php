@@ -27,7 +27,7 @@ class CategorySaveRequest extends Request
         return [
             'name' => 'required',
             'color' => 'required|string',
-            'cover_photo' => 'nullable|file',
+            'cover_photo' => 'nullable|image',
             'parent_id' => 'nullable|integer|min:1|exists:categories,id'
         ];
     }

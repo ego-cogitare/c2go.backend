@@ -39,8 +39,11 @@
 </div>
 <div class="form-group {{ $errors->has('color') ? 'has-error' : ''}}">
     <label for="color" class="col-md-4 control-label">{{ 'Color' }}</label>
-    <div class="col-md-6">
-        <input class="type-color" name="color" type="color" id="color" value="{{ $category->color or ''}}" >
+    <div class="col-md-6 input-group color-picker" style="padding:0 15px">
+        <input class="form-control" name="color" type="text" id="color" value="{{ $category->color or ''}}" />
+        <div class="input-group-addon">
+            <i></i>
+        </div>
         {!! $errors->first('color', '<p class="help-block">:message</p>') !!}
     </div>
 </div>

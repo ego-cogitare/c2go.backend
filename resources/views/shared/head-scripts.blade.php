@@ -29,6 +29,9 @@
 <!-- Google Font -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 
+<!-- Google Maps -->
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQd8ifFv5_cNqRZ0oFtizulSNbruyuFas&libraries=places"></script>
+
 <!-- jQuery -->
 <script type="text/javascript" src="{{ asset('js/jquery.min.js') }}"></script>
 
@@ -40,6 +43,17 @@
 <script type="text/javascript" src="{{ asset('js/morris.min.js') }}"></script>
 <link rel="stylesheet" href="{{ asset('css/morris.css') }}">
 
+<!-- Color picker -->
+<script type="text/javascript" src="{{ asset('js/bootstrap-colorpicker.min.js') }}"></script>
+<link rel="stylesheet" href="{{ asset('css/bootstrap-colorpicker.min.css') }}">
+
+<!-- Moment JS -->
+<script type="text/javascript" src="{{ asset('js/moment-with-locales.js') }}"></script>
+
+<!-- Datetime picker -->
+<script type="text/javascript" src="{{ asset('js/bootstrap-datetimepicker.js') }}"></script>
+<link rel="stylesheet" href="{{ asset('css/bootstrap-datetimepicker.min.css') }}">
+
 <!-- Trumbowyg -->
 <link rel="stylesheet" href="https://cdn.rawgit.com/Alex-D/Trumbowyg/v2.9.2/dist/ui/trumbowyg.min.css">
 <script type="text/javascript" src="https://cdn.rawgit.com/Alex-D/Trumbowyg/v2.9.2/dist/trumbowyg.min.js"></script>
@@ -48,4 +62,5 @@
 <link rel="stylesheet" href="{{ asset('plugins/iCheck/all.css') }}">
 <script type="text/javascript" src="{{ asset('plugins/iCheck/icheck.min.js') }}"></script>
 
-<link rel="stylesheet" href="{{ asset('css/questionnaire.min.css') }}" />
+<!-- Project JS -->
+<script type="text/javascript" src="{{ asset('js/main.js') }}" defer></script>
