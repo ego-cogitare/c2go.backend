@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title') Event view @endsection
+
 @section('content')
     <div class="row">
         <div class="col-md-12">
@@ -22,9 +24,21 @@
                         <table class="table table-borderless">
                             <tbody>
                                 <tr>
-                                    <th>ID</th><td>{{ $event->id }}</td>
+                                    <th>ID</th>
+                                    <td>{{ $event->id }}</td>
                                 </tr>
-                                <tr><th> Category Id </th><td> {{ $event->category_id }} </td></tr><tr><th> User Id </th><td> {{ $event->user_id }} </td></tr><tr><th> Name </th><td> {{ $event->name }} </td></tr>
+                                <tr>
+                                    <th> Category Id </th>
+                                    <td> {{ $event->category->name }} </td>
+                                </tr>
+                                <tr>
+                                    <th> User Id </th>
+                                    <td> {{ $event->user->getFullName() }} </td>
+                                </tr>
+                                <tr>
+                                    <th> Name </th>
+                                    <td> {{ $event->name }} </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

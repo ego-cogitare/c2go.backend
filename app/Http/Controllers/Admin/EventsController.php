@@ -38,9 +38,13 @@ class EventsController extends Controller
         $perPage = 25;
 
         if (!empty($keyword)) {
-            $events = Event::paginate($perPage);
+            $events = Event::with(['category', 'user'])
+                ->where('name', 'LIKE', "%$keyword%")
+                ->orWhere('event_location_human', 'LIKE', "%$keyword%")
+                ->orderBy('date', 'DESC')
+                ->paginate();
         } else {
-            $events = Event::paginate($perPage);
+            $events = Event::orderBy('date', 'DESC')->paginate($perPage);
         }
 
         return view('admin.events.index', compact('events'));

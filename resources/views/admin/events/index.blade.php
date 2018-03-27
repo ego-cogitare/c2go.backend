@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title') Events @endsection
+
 @section('content')
     <div class="row">
         <div class="col-md-12">
@@ -27,14 +29,26 @@
                         <table class="table table-borderless">
                             <thead>
                                 <tr>
-                                    <th>#</th><th>Category Id</th><th>User Id</th><th>Name</th><th>Actions</th>
+                                    <th>#</th>
+                                    <th>Category</th>
+                                    <th>Creator</th>
+                                    <th>Name</th>
+                                    <th>Event Date</th>
+                                    <th>Location</th>
+                                    <th>Price</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                             @foreach($events as $item)
                                 <tr>
-                                    <td>{{ $loop->iteration or $item->id }}</td>
-                                    <td>{{ $item->category_id }}</td><td>{{ $item->user_id }}</td><td>{{ $item->name }}</td>
+                                    <td>{{ $item->id }}</td>
+                                    <td>{{ $item->category->name }}</td>
+                                    <td>{{ $item->user->getFullName() }}</td>
+                                    <td>{{ $item->name }}</td>
+                                    <td>{{ Carbon\Carbon::parse($item->date)->format(env('DATETIME_FORMAT')) }}</td>
+                                    <td>{{ $item->event_location_human }}</td>
+                                    <td>{{ $item->price }}</td>
                                     <td>
                                         <a href="{{ url('/admin/events/' . $item->id) }}" title="View event"><button class="btn btn-info btn-xs"><i class="fa fa-eye" aria-hidden="true"></i> View</button></a>
                                         <a href="{{ url('/admin/events/' . $item->id . '/edit') }}" title="Edit event"><button class="btn btn-primary btn-xs"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Edit</button></a>

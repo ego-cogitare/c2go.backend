@@ -22,16 +22,28 @@ class Event extends Model
         'event_destination_latlng', 
         'date',
         'price', 
+        'is_top',
         'is_active'
     ];
     
     public function category() 
     {
-        return $this->hasOne('App\Models\Category');
+        return $this->belongsTo('App\Models\Category');
     }
     
     public function user() 
     {
-        return $this->hasOne('App\Models\User');
+        return $this->belongsTo('App\Models\User');
+    }
+    
+    /**
+     * Get the event date.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getDateAttribute($value)
+    {
+        return \Carbon\Carbon::parse($value)->format(env('DATETIME_FORMAT'));
     }
 }

@@ -15,6 +15,9 @@ use App\Http\Middleware\CheckRegCompleteness;
 
 Route::group(['namespace' => 'Api'], function () {
     
+    Route::get('/events', 'EventsController@index');
+    Route::get('/categories', 'CategoriesController@index');
+    
     Route::group(['prefix' => 'auth'], function () {
         Route::post('/login', 'AuthController@login')->name('auth_login');
         Route::post('/user-validation', 'AuthController@userValidation');

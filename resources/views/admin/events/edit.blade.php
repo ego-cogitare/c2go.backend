@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title') Event edit @endsection
+
 @section('content')
     <div class="row">
         <div class="col-md-12">

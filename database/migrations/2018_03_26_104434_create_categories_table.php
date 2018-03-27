@@ -18,7 +18,7 @@ class CreateCategoriesTable extends Migration
             $table->timestamps();
             $table->unsignedInteger('parent_id')->nullable();
             $table->string('name');
-            $table->string('color', 16);
+            $table->string('color', 32);
             $table->string('cover_photo', 64);
             $table->unsignedInteger('order')->nullable();
             $table->unsignedTinyInteger('is_active')->default(1);
