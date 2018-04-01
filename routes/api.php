@@ -15,6 +15,7 @@ use App\Http\Middleware\CheckRegCompleteness;
 
 Route::group(['namespace' => 'Api'], function () {
     
+    Route::get('/event/{id}', 'EventsController@show');
     Route::get('/events', 'EventsController@index');
     Route::get('/categories', 'CategoriesController@index');
     

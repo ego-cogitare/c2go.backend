@@ -7,10 +7,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Hash;
 use App\Models\UserSetting;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class User extends Authenticatable
 {
     use SoftDeletes;
+    
+    protected $appends = ['age', 'rank'];
 
     /**
      * The attributes that are mass assignable.
@@ -38,6 +41,16 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+    
+    public function getAgeAttribute() 
+    {
+        return Carbon::parse($this->attributes['birth_date'])->age;
+    }
+    
+    public function getRankAttribute() 
+    {
+        return rand(1, 5);
+    }
 
     public function setPasswordAttribute($value)
     {
@@ -47,6 +60,11 @@ class User extends Authenticatable
     public function settings()
     {
         return $this->hasMany('App\Models\UserSetting');
+    }
+    
+    public function prices()
+    {
+        return $this->hasMany('App\Models\EventProposal');
     }
     
     public function getFullName() 

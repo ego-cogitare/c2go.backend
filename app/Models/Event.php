@@ -36,6 +36,16 @@ class Event extends Model
         return $this->belongsTo('App\Models\User');
     }
     
+    public function proposals() 
+    {
+        return $this->hasManyThrough('App\Models\User', 'App\Models\EventProposal', 'event_id', 'id', 'id', 'user_id');
+    }
+    
+    public function prices() 
+    {
+        return $this->hasMany('App\Models\EventProposal');
+    }
+    
     /**
      * Get the event date.
      *

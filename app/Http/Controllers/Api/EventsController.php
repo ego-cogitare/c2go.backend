@@ -6,6 +6,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\EventProposal;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -96,6 +97,32 @@ class EventsController extends Controller
         return response()->json([
             'success' => true, 
             'data' => $result
+        ]);
+    }
+    
+    public function show($id) 
+    {
+        $event = Event::with([
+            'proposals' => function($query) use($id) {
+                $query->with([
+                    'settings', 
+                    'prices' => function($query) use($id) {
+                        $query->where('event_id', $id);
+                    }
+                ]);
+            }, 
+            'user',
+            'category', 
+        ])
+        ->find($id);
+        
+        if (empty($event)) {
+            return response()->json(['success' => false], 404);
+        }
+        
+        return response()->json([
+            'success' => true, 
+            'data' => $event
         ]);
     }
 }
