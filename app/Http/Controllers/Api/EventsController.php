@@ -100,7 +100,7 @@ class EventsController extends Controller
         ]);
     }
     
-    public function show($id) 
+    public function proposals($id) 
     {
         $event = Event::with([
             'proposals' => function($query) use($id) {
@@ -115,6 +115,42 @@ class EventsController extends Controller
             'category', 
         ])
         ->find($id);
+        
+        if (empty($event)) {
+            return response()->json(['success' => false], 404);
+        }
+        
+        return response()->json([
+            'success' => true, 
+            'data' => $event
+        ]);
+    }
+    
+    public function requests($event, $user)
+    {
+        $event = EventProposal::with([
+            'event' => function($query) use($user) {
+                $query->with([
+                    'requests' => function($query) use($user) {
+                        $query->with(['user' => function($query) {
+                            $query->with(['settings']);
+                        }])
+                        ->where('event_user_id', $user);
+                    },
+                    'category' => function($query) {
+                        $query->with(['parent']);
+                    }
+                ]);
+            }, 
+            'user' => function($query) {
+                $query->with('settings');
+            },
+        ])
+        ->where([
+            'event_id' => $event,
+            'user_id' => $user,
+        ])
+        ->first();
         
         if (empty($event)) {
             return response()->json(['success' => false], 404);

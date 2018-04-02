@@ -25,7 +25,6 @@ class CreateEventsTable extends Migration
             $table->string('event_destination_human')->nullable();
             $table->json('event_destination_latlng')->nullable();
             $table->dateTime('date');
-            $table->unsignedDecimal('price', 8, 2);
             $table->unsignedTinyInteger('is_top')->default(0);
             $table->unsignedTinyInteger('is_active')->default(1);
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');

@@ -14,12 +14,15 @@ use App\Http\Middleware\CheckRegCompleteness;
 */
 
 Route::group(['namespace' => 'Api'], function () {
+    Route::group(['prefix' => 'events'], function() {
+        Route::get('/proposals/{id}', 'EventsController@proposals');
+        Route::get('/requests/{event}/user/{user}', 'EventsController@requests');
+        Route::get('/', 'EventsController@index');
+    });
     
-    Route::get('/event/{id}', 'EventsController@show');
-    Route::get('/events', 'EventsController@index');
     Route::get('/categories', 'CategoriesController@index');
     
-    Route::group(['prefix' => 'auth'], function () {
+    Route::group(['prefix' => 'auth'], function() {
         Route::post('/login', 'AuthController@login')->name('auth_login');
         Route::post('/user-validation', 'AuthController@userValidation');
         Route::post('/registration', 'AuthController@registration')->name('auth_registration');
@@ -31,14 +34,14 @@ Route::group(['namespace' => 'Api'], function () {
                 'show', 'update', 'destroy'
             ]]);
         });
-        Route::group(['middleware' => ['web']], function () {
+        Route::group(['middleware' => ['web']], function() {
             Route::post('/{provider}', 'AuthController@social');
             Route::get('/{provider}', 'AuthController@redirectToProvider');
         });
     });
     
     Route::group(['middleware' => ['jwt.auth']], function() {
-        Route::group(['prefix' => 'user'], function () {
+        Route::group(['prefix' => 'user'], function() {
             Route::post('/progress/{progress}', 'UserController@updateProgress');
             Route::post('/profile-photo', 'UserController@profilePhoto');
         });

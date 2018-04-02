@@ -21,7 +21,6 @@ class Event extends Model
         'event_destination_human', 
         'event_destination_latlng', 
         'date',
-        'price', 
         'is_top',
         'is_active'
     ];
@@ -44,6 +43,11 @@ class Event extends Model
     public function prices() 
     {
         return $this->hasMany('App\Models\EventProposal');
+    }
+    
+    public function requests() 
+    {
+        return $this->hasMany('App\Models\EventRequest');
     }
     
     /**
