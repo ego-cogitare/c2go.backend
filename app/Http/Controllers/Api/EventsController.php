@@ -34,11 +34,16 @@ class EventsController extends Controller
         {
             $events = Event::with([
                     'category', 
+                    'proposals',
                     'user' => function($query) {
                         $query->with(['settings']);
-                    },
-                    'proposals'
+                    }
                 ])
+                ->select('events.*', 'ep.price')
+                ->leftJoin('event_proposals as ep', function($join) {
+                    $join->on('ep.user_id', '=', 'events.user_id');
+                    $join->on('ep.event_id', '=', 'events.id');
+                })
                 ->where('is_top', $i)
                 ->where('is_active', 1)
                 ->where('date', '>', date('Y-m-d H:i:s'));
