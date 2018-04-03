@@ -17,6 +17,7 @@ Route::group(['namespace' => 'Api'], function () {
     Route::group(['prefix' => 'events'], function() {
         Route::get('/proposals/{id}', 'EventsController@proposals');
         Route::get('/requests/{event}/user/{user}', 'EventsController@requests');
+        Route::get('/general/{event}/user/{user}', 'EventsController@general');
         Route::get('/', 'EventsController@index');
     });
     
@@ -47,6 +48,7 @@ Route::group(['namespace' => 'Api'], function () {
         });
         Route::group(['middleware' => CheckRegCompleteness::class], function() {
             Route::get('/dashboard', 'DashboardController@index');
+            Route::post('/events/requests/{event}/user/{user}', 'EventsController@storeRequest');
             Route::get('/check/restricted', 'CheckController@restricted');
             Route::get('/faq', 'FAQController@index');
             Route::post('/testimonial', 'TestimonialController@store');

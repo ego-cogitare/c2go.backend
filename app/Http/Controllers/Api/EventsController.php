@@ -6,9 +6,11 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\EventRequest;
 use App\Models\EventProposal;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class EventsController extends Controller
 {
@@ -30,9 +32,13 @@ class EventsController extends Controller
         
         for ($i = 1; $i >= 0; $i--) 
         {
-            $events = Event::with(['category', 'user' => function($query) {
-                    $query->with(['settings']);
-                }])
+            $events = Event::with([
+                    'category', 
+                    'user' => function($query) {
+                        $query->with(['settings']);
+                    },
+                    'proposals'
+                ])
                 ->where('is_top', $i)
                 ->where('is_active', 1)
                 ->where('date', '>', date('Y-m-d H:i:s'));
@@ -80,6 +86,17 @@ class EventsController extends Controller
                         'events' => []
                     ];
                 }
+                
+                /** 
+                 * Limit top categories by 1 entry 
+                 * Limit default categories by 10 entries (if separate category browse - results not limited)
+                 */
+                if ($i === 0 && empty($category_id) && sizeof($result[$i][$parent_category->id]['events']) > 9 || 
+                    $i === 1 && sizeof($result[$i][$parent_category->id]['events']) > 0
+                ) {
+                    continue;
+                }
+                
                 $result[$i][$parent_category->id]['events'][] = $event;
             }
             
@@ -159,6 +176,61 @@ class EventsController extends Controller
         return response()->json([
             'success' => true, 
             'data' => $event
+        ]);
+    }
+    
+    public function general($event, $user)
+    {
+        $event = EventProposal::with([
+            'event' => function($query) use($user) {
+                $query->with([
+                    'category' => function($query) {
+                        $query->with(['parent']);
+                    }
+                ]);
+            }, 
+            'user' => function($query) {
+                $query->with('settings');
+            },
+        ])
+        ->where([
+            'event_id' => $event,
+            'user_id' => $user,
+        ])
+        ->first();
+        
+        if (empty($event)) {
+            return response()->json(['success' => false], 404);
+        }
+        
+        return response()->json([
+            'success' => true, 
+            'data' => $event
+        ]);
+    }
+    
+    public function storeRequest(Request $request, $event, $user)
+    {
+        $request->request->add([
+            'event_user_id' => intval($user), 
+            'event_id' => intval($event),
+            'user_id' => Auth::user()->id,
+        ]);
+        
+        $data = $request->all();
+        
+        $request->validate([
+            'event_user_id' => 'required|integer|exists:users,id',
+            'user_id' => 'required|integer|exists:users,id',
+            'event_id' => 'required|integer|exists:events,id',
+            'message' => 'required|string|min:10|max:120',
+        ]);
+        
+        $event_request = EventRequest::create($data);
+        
+        return response()->json([
+            'success' => true, 
+            'data' => $event_request
         ]);
     }
 }
