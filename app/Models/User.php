@@ -71,4 +71,9 @@ class User extends Authenticatable
     {
         return $this->first_name . ' ' . $this->last_name;
     }
+    
+    public function setBirthDateAttribute($value)
+    {
+        return Carbon::createFromFormat('d.m.Y', $value)->format('Y-m-d');
+    }
 }

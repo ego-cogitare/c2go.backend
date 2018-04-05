@@ -25,7 +25,7 @@ class UpdateUserProgressRequest extends Request
     {
         return [
             'progress' => 'required|integer|min:2|max:6',
-            'section' => 'nullable|in:location,profile_photo,profile_type',
+            'section' => 'nullable|in:location,profile_photo,profile_type,profile_settings,profile_interests',
         ];
     }
 }

@@ -18,7 +18,7 @@ class CreateTableUserSettings extends Migration
             $table->timestamps();
             $table->string('section', 32);
             $table->unsignedInteger('user_id');
-            $table->string('value');
+            $table->string('value', 1024);
             $table->unique(['section', 'user_id'], 'unique_section_user_id');
         });
     }

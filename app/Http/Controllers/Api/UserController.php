@@ -150,8 +150,9 @@ class UserController extends Controller
         
         $data = $request->only(['section', 'value']);
         
-        // Save setting
-        if (!empty($data['section'])) {
+        // Save settings
+        if (!empty($data['section'])) 
+        {
             UserSetting::apply(Auth::user()->id, $data['section'], $data['value']);
         }
         
