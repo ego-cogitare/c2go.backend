@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class EventProposal extends Model
+class UserReview extends Model
 {
     /**
      * Attributes that should be mass-assignable.
@@ -12,15 +12,15 @@ class EventProposal extends Model
      * @var array
      */
     protected $fillable = [
-        'event_id', 
-        'user_id', 
-        'price', 
-        'message', 
+        'user_about_id',
+        'user_id',
+        'message',
+        'is_active',
     ];
     
-    public function event() 
+    public function userAbout() 
     {
-        return $this->belongsTo('App\Models\Event');
+        return $this->belongsTo('App\Models\User', 'user_about_id', 'id');
     }
     
     public function user() 

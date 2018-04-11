@@ -35,9 +35,7 @@ class EventsController extends Controller
             $events = Event::with([
                     'category', 
                     'proposals',
-                    'user' => function($query) {
-                        $query->with(['settings']);
-                    }
+                    'user'
                 ])
                 ->select('events.*', 'ep.price')
                 ->leftJoin('event_proposals as ep', function($join) {
@@ -127,7 +125,6 @@ class EventsController extends Controller
         $event = Event::with([
             'proposals' => function($query) use($id) {
                 $query->with([
-                    'settings', 
                     'prices' => function($query) use($id) {
                         $query->where('event_id', $id);
                     }
@@ -148,24 +145,25 @@ class EventsController extends Controller
         ]);
     }
     
-    public function requests($event, $user)
+    public function details(Request $request, $event, $user)
     {
+        $limit = $request->get('limit', 5);
+        $offset = $request->get('offset', 0);
+        
         $event = EventProposal::with([
             'event' => function($query) use($user) {
                 $query->with([
-                    'requests' => function($query) use($user) {
-                        $query->with(['user' => function($query) {
-                            $query->with(['settings']);
-                        }])
-                        ->where('event_user_id', $user);
-                    },
                     'category' => function($query) {
                         $query->with(['parent']);
                     }
                 ]);
             }, 
-            'user' => function($query) {
-                $query->with('settings');
+            'user' => function($query) use($limit, $offset) {
+                $query->with([
+                    'reviews' => function($query) use($limit, $offset) {
+                        $query->with(['user'])->limit($limit)->offset($offset);
+                    }
+                ]);
             },
         ])
         ->where([
@@ -194,9 +192,7 @@ class EventsController extends Controller
                     }
                 ]);
             }, 
-            'user' => function($query) {
-                $query->with('settings');
-            },
+            'user',
         ])
         ->where([
             'event_id' => $event,
@@ -237,5 +233,59 @@ class EventsController extends Controller
             'success' => true, 
             'data' => $event_request
         ]);
+    }
+    
+    /**
+     * Get current logged in user events requests
+     */
+    public function showUserRequests() 
+    {
+        $events = EventRequest::with(['user'])
+            ->select(
+                'event_requests.id', 
+                'event_requests.state',
+                'event_requests.message',
+                'event_requests.user_id',
+                'event_requests.event_user_id',
+                \DB::raw('DATE_FORMAT(events.date, \'%d.%m.%Y\') AS date')
+            )
+            ->leftJoin('events', 'events.id', '=', 'event_requests.event_id')
+            ->where('event_requests.is_active', 1)
+            ->where('event_requests.event_user_id', Auth::user()->id)
+            ->orderBy('events.date', 'asc')
+            ->get();
+                
+        return response()->json([
+            'success' => true,
+            'data' => $events
+        ]);
+    }
+    
+    public function showEventAccept($event) 
+    {
+        $data = EventRequest::with(['author', 'user', 'event' => function($query) {
+                $query->with('category');
+            }])
+            ->select(
+                'event_requests.*', 
+                'event_proposals.price', 
+                'event_proposals.message as request_message'
+            )
+            ->leftJoin('event_proposals', function($join) {
+                $join->on('event_proposals.user_id', '=', 'event_requests.event_user_id');
+                $join->on('event_proposals.event_id', '=', 'event_requests.event_id');
+            })
+            ->where([
+                'event_requests.id' => $event,
+                'event_requests.is_active' => 1,
+                'event_requests.event_user_id' => Auth::user()->id
+            ])
+            ->first();
+        
+        if (empty($data)) {
+            return response()->json(['success' => false], 404);
+        }
+        
+        return response()->json(['success' => true, 'data' => $data]);
     }
 }

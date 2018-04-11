@@ -13,7 +13,11 @@ class User extends Authenticatable
 {
     use SoftDeletes;
     
-    protected $appends = ['age', 'rank'];
+    protected $appends = [
+        'age', 
+        'rank',
+        'settings'
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -39,7 +43,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 
+        'remember_token',
     ];
     
     public function getAgeAttribute() 
@@ -57,14 +62,19 @@ class User extends Authenticatable
         $this->attributes['password'] = Hash::make($value);
     }
     
-    public function settings()
-    {
-        return $this->hasMany('App\Models\UserSetting');
-    }
+//    public function settings()
+//    {
+//        return $this->hasMany('App\Models\UserSetting');
+//    }
     
     public function prices()
     {
         return $this->hasMany('App\Models\EventProposal');
+    }
+    
+    public function reviews() 
+    {
+        return $this->hasMany('App\Models\UserReview', 'user_about_id');
     }
     
     public function getFullName() 
@@ -74,6 +84,37 @@ class User extends Authenticatable
     
     public function setBirthDateAttribute($value)
     {
-        return Carbon::createFromFormat('d.m.Y', $value)->format('Y-m-d');
+        $this->attributes['birth_date'] = Carbon::createFromFormat('d.m.Y', $value)->format('Y-m-d');
+    }
+    
+    public function getSettingsAttribute() 
+    {
+        $settings = UserSetting::where('user_id', $this->id)
+            ->get()
+            ->pluck('value', 'section');
+        
+        foreach ($settings as $section => $value) {
+            switch ($section) {
+                case 'location':
+                    $settings[$section] = json_decode($value);
+                break;
+                
+                case 'profile_settings':
+                    $settings[$section] = [];
+                break;
+            
+                case 'profile_interests':
+                    $data = json_decode($value);
+                    $categories = [];
+                    if (!empty($data->categories)) {
+                        $settings[$section] = Category::whereIn('id', $data->categories)
+                            ->get()
+                            ->toArray();
+                    }
+                break;
+            }
+        }
+        
+        return $settings;
     }
 }

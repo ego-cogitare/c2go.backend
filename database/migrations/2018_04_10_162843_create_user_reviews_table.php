@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateEventProposalsTable extends Migration
+class CreateUserReviewsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,15 @@ class CreateEventProposalsTable extends Migration
      */
     public function up()
     {
-        Schema::create('event_proposals', function (Blueprint $table) {
+        Schema::create('user_reviews', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
-            $table->unsignedInteger('event_id');
+            $table->unsignedInteger('user_about_id');
             $table->unsignedInteger('user_id');
-            $table->decimal('price', 8, 2);
-            $table->string('message', 1024);
-            $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
+            $table->string('message', 255);
+            $table->unsignedTinyInteger('is_active')->default(1);
+            $table->foreign('user_about_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->unique(['event_id', 'user_id']);
         });
     }
 
@@ -33,6 +32,6 @@ class CreateEventProposalsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('event_proposals');
+        Schema::dropIfExists('user_reviews');
     }
 }

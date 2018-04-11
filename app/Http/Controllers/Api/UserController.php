@@ -168,7 +168,7 @@ class UserController extends Controller
         
         return response()->json([
             'status' => true,
-            'user' => User::with(['settings'])->find(Auth::user()->id)
+            'user' => User::find(Auth::user()->id)
         ]);
     }
 }

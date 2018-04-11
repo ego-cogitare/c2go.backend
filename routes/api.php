@@ -15,10 +15,10 @@ use App\Http\Middleware\CheckRegCompleteness;
 
 Route::group(['namespace' => 'Api'], function () {
     Route::group(['prefix' => 'events'], function() {
-        Route::get('/proposals/{id}', 'EventsController@proposals');
-        Route::get('/requests/{event}/user/{user}', 'EventsController@requests');
-        Route::get('/general/{event}/user/{user}', 'EventsController@general');
         Route::get('/', 'EventsController@index');
+        Route::get('/proposals/{id}', 'EventsController@proposals');
+        Route::get('/details/{event}/user/{user}', 'EventsController@details');
+        Route::get('/general/{event}/user/{user}', 'EventsController@general');
     });
     
     Route::get('/categories', 'CategoriesController@index');
@@ -47,8 +47,16 @@ Route::group(['namespace' => 'Api'], function () {
             Route::post('/profile-photo', 'UserController@profilePhoto');
         });
         Route::group(['middleware' => CheckRegCompleteness::class], function() {
-            Route::get('/dashboard', 'DashboardController@index');
-            Route::post('/events/requests/{event}/user/{user}', 'EventsController@storeRequest');
+            Route::group(['prefix' => 'events'], function() {
+                // Get curent logged in user event requests
+                Route::get('/requests', 'EventsController@showUserRequests');
+                
+                // Make event {event} request to the user {user}
+                Route::post('/requests/{event}/user/{user}', 'EventsController@storeRequest');
+                
+                // Show details
+                Route::get('/accept/{event}', 'EventsController@showEventAccept');
+            });
             Route::get('/check/restricted', 'CheckController@restricted');
             Route::get('/faq', 'FAQController@index');
             Route::post('/testimonial', 'TestimonialController@store');

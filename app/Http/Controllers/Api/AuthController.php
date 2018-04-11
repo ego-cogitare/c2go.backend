@@ -28,7 +28,7 @@ class AuthController extends Controller
             if (!$token = JWTAuth::attempt($credentials, ['is_blocked' => false])) {
                 return response()->json(['error' => 'invalid_credentials'], 401);
             }
-            $user = User::with(['settings'])->find(JWTAuth::toUser($token)->id);
+            $user = User::find(JWTAuth::toUser($token)->id);
         } catch (JWTException $e) {
             return response()->json(['error' => 'could_not_create_token'], 500);
         }
@@ -98,7 +98,7 @@ class AuthController extends Controller
         
         $user = User::create($data);
         $token = JWTAuth::fromUser($user);
-        $user = User::with(['settings'])->find($user->id);
+        $user = User::find($user->id);
         
         // Save user location to user settings table
         UserSetting::location($user->id, $data['location']);
