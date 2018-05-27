@@ -27,4 +27,28 @@ class CategoriesController extends Controller
             'data' => $result
         ]);
     }
+    
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function show(Request $request, $category)
+    {
+        $result = Category::with(['categories'])
+            ->where('id', $category)
+            ->where('is_active', 1)
+            ->whereNull('parent_id')
+            ->first();
+        
+        if (empty($result)) 
+        {
+            return response()->json(['success' => false], 404);
+        }
+            
+        return response()->json([
+            'success' => true, 
+            'data' => $result
+        ]);
+    }
 }

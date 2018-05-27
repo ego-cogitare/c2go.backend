@@ -22,6 +22,7 @@ Route::group(['namespace' => 'Api'], function () {
     });
     
     Route::get('/categories', 'CategoriesController@index');
+    Route::get('/category/{category}', 'CategoriesController@show');
     
     Route::group(['prefix' => 'auth'], function() {
         Route::post('/login', 'AuthController@login')->name('auth_login');
