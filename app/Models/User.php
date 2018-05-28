@@ -62,11 +62,6 @@ class User extends Authenticatable
         $this->attributes['password'] = Hash::make($value);
     }
     
-//    public function settings()
-//    {
-//        return $this->hasMany('App\Models\UserSetting');
-//    }
-    
     public function prices()
     {
         return $this->hasMany('App\Models\EventProposal');
@@ -106,10 +101,22 @@ class User extends Authenticatable
                 case 'profile_interests':
                     $data = json_decode($value);
                     $categories = [];
+                    
                     if (!empty($data->categories)) {
-                        $settings[$section] = Category::whereIn('id', $data->categories)
+                        $settings[$section] = Category::with([
+                                'categories' => function($query) use ($data) {
+                                    $query->whereIn('id', $data->categories);
+                                }
+                            ])
+                            ->where('is_active', 1)
+                            ->whereNull('parent_id')
+                            ->orderBy('order', 'ASC')
                             ->get()
                             ->toArray();
+                        
+                        /*$settings[$section] = Category::whereIn('id', $data->categories)
+                            ->get()
+                            ->toArray();*/
                     }
                 break;
             }

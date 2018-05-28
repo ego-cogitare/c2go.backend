@@ -171,4 +171,32 @@ class UserController extends Controller
             'user' => User::find(Auth::user()->id)
         ]);
     }
+    
+    /**
+     * Get user information
+     * 
+     * @param Request $request
+     * @param type $user
+     * @return void
+     */
+    public function profileInfo(Request $request, $user) 
+    {
+        $data = User::find($user);
+        
+        if (!$data) {
+            $result = [
+                'status' => false,
+                'error' => 'User not found'
+            ];
+            $code = 404;
+        } else {
+            $result = [
+                'status' => true,
+                'data' => $data
+            ];
+            $code = 200;
+        }
+        
+        return new Response($result, $code);
+    }
 }

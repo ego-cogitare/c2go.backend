@@ -46,6 +46,7 @@ Route::group(['namespace' => 'Api'], function () {
         Route::group(['prefix' => 'user'], function() {
             Route::post('/progress/{progress}', 'UserController@updateProgress');
             Route::post('/profile-photo', 'UserController@profilePhoto');
+            Route::get('/{user}/info', 'UserController@profileInfo');
         });
         Route::group(['middleware' => CheckRegCompleteness::class], function() {
             Route::group(['prefix' => 'events'], function() {
