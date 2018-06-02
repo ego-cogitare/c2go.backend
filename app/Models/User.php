@@ -122,6 +122,12 @@ class User extends Authenticatable
             }
         }
         
+        /** Mock with required fields */
+        $settings = array_merge([
+                'profile_interests' => []
+            ], $settings->toArray()
+        );
+        
         return $settings;
     }
 }

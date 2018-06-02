@@ -28,10 +28,10 @@ Route::group(['namespace' => 'Api'], function () {
         Route::post('/login', 'AuthController@login')->name('auth_login');
         Route::post('/user-validation', 'AuthController@userValidation');
         Route::post('/registration', 'AuthController@registration')->name('auth_registration');
-        Route::post('/forgot_password', 'AuthController@forgotPassword');
+        Route::post('/forgot-password', 'AuthController@forgotPassword');
         Route::group(['middleware' => ['jwt.auth',]], function () {
             Route::get('/user', 'AuthController@getAuthenticatedUser')->name('auth_getAuthenticatedUser');
-            Route::get('/token', 'AuthController@refreshToken');
+            Route::get('/refresh-token', 'AuthController@refreshToken');
             Route::resource('user', 'UserController', ['only' => [
                 'show', 'update', 'destroy'
             ]]);
