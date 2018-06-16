@@ -33,15 +33,11 @@ class EventsController extends Controller
         for ($i = 1; $i >= 0; $i--) 
         {
             $events = Event::with([
-                    'category', 
-                    'proposals',
-                    'user'
+                    'category',
+                    'bestProposal' => function($query) {
+                        $query->with(['user'])->select(['id', 'price', 'event_id', 'user_id']);
+                    },
                 ])
-                ->select('events.*', 'ep.price')
-                ->leftJoin('event_proposals as ep', function($join) {
-                    $join->on('ep.user_id', '=', 'events.user_id');
-                    $join->on('ep.event_id', '=', 'events.id');
-                })
                 ->where('is_top', $i)
                 ->where('is_active', 1)
                 ->where('date', '>', date('Y-m-d H:i:s'));
@@ -77,7 +73,7 @@ class EventsController extends Controller
             }
             
             $events = $events->orderBy('date', 'ASC')->get();
-
+            
             foreach ($events as $event) {
                 $parent_category = $event->category->parent 
                     ? $event->category->parent 
@@ -95,7 +91,7 @@ class EventsController extends Controller
                  * Limit default categories by 10 entries (if separate category browse - results not limited)
                  */
                 if ($i === 0 && empty($category_id) && sizeof($result[$i][$parent_category->id]['events']) > 9 || 
-                    $i === 1 && sizeof($result[$i][$parent_category->id]['events']) > 0
+                    $i === 1 && sizeof($result[$i][$parent_category->id]['events']) > 2
                 ) {
                     continue;
                 }
@@ -124,11 +120,7 @@ class EventsController extends Controller
     {
         $event = Event::with([
             'proposals' => function($query) use($id) {
-                $query->with([
-                    'prices' => function($query) use($id) {
-                        $query->where('event_id', $id);
-                    }
-                ]);
+                $query->with(['user'])->orderBy('price', 'ASC');
             }, 
             'user',
             'category', 

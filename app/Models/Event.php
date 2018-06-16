@@ -8,7 +8,6 @@ class Event extends Model
 {
     /**
      * Attributes that should be mass-assignable.
-     *
      * @var array
      */
     protected $fillable = [
@@ -25,6 +24,13 @@ class Event extends Model
         'is_active'
     ];
     
+    /**
+     * @var array 
+     */
+    protected $appends = [
+        'proposals_count'
+    ];
+    
     public function category() 
     {
         return $this->belongsTo('App\Models\Category');
@@ -35,12 +41,12 @@ class Event extends Model
         return $this->belongsTo('App\Models\User');
     }
     
-    public function proposals() 
+    public function bestProposal() 
     {
-        return $this->hasManyThrough('App\Models\User', 'App\Models\EventProposal', 'event_id', 'id', 'id', 'user_id');
+        return $this->hasOne('App\Models\EventProposal')->orderBy('price', 'ASC');
     }
     
-    public function prices() 
+    public function proposals() 
     {
         return $this->hasMany('App\Models\EventProposal');
     }
@@ -52,12 +58,20 @@ class Event extends Model
     
     /**
      * Get the event date.
-     *
      * @param  string  $value
      * @return string
      */
     public function getDateAttribute($value)
     {
         return \Carbon\Carbon::parse($value)->format(env('DATETIME_FORMAT'));
+    }
+    
+    /**
+     * Get event proposals amount
+     * @return int
+     */
+    public function getProposalsCountAttribute()
+    {
+        return EventProposal::where('event_id', $this->id)->count();
     }
 }
