@@ -19,6 +19,7 @@ Route::group(['namespace' => 'Api'], function () {
         Route::get('/proposals/{id}', 'EventsController@proposals');
         Route::get('/details/{event}/user/{user}', 'EventsController@details');
         Route::get('/general/{event}/user/{user}', 'EventsController@general');
+        Route::get('/autocomplete', 'EventsController@autocomplete');
     });
     
     Route::get('/categories', 'CategoriesController@index');

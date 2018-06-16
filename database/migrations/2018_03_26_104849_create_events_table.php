@@ -19,7 +19,6 @@ class CreateEventsTable extends Migration
             $table->unsignedInteger('category_id');
             $table->unsignedInteger('user_id');
             $table->string('name');
-            $table->string('description', 255);
             $table->string('event_location_human');
             $table->json('event_location_latlng');
             $table->string('event_destination_human')->nullable();

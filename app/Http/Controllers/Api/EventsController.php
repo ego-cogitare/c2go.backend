@@ -11,10 +11,14 @@ use App\Models\EventProposal;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\AutocompleteRequest;
+use DB;
 
 class EventsController extends Controller
 {
     const RIDE_CATEGORY_IDS = [4];
+    const DEFAULT_CATEGORY_ITEMS_LIMIT = 10;
+    const TOP_CATEGORY_ITEMS_LIMIT = 3;
     
     /**
      * Display a listing of the resource.
@@ -90,8 +94,8 @@ class EventsController extends Controller
                  * Limit top categories by 1 entry 
                  * Limit default categories by 10 entries (if separate category browse - results not limited)
                  */
-                if ($i === 0 && empty($category_id) && sizeof($result[$i][$parent_category->id]['events']) > 9 || 
-                    $i === 1 && sizeof($result[$i][$parent_category->id]['events']) > 2
+                if ($i === 0 && empty($category_id) && sizeof($result[$i][$parent_category->id]['events']) >= self::DEFAULT_CATEGORY_ITEMS_LIMIT || 
+                    $i === 1 && sizeof($result[$i][$parent_category->id]['events']) >= self::TOP_CATEGORY_ITEMS_LIMIT
                 ) {
                     continue;
                 }
@@ -279,5 +283,25 @@ class EventsController extends Controller
         }
         
         return response()->json(['success' => true, 'data' => $data]);
+    }
+    
+    /**
+     * Event searching for autocomplete (during event adding)
+     * @param AutocompleteRequest $request
+     * @return string
+     */
+    public function autocomplete(Requests\AutocompleteRequest $request)
+    {
+        $keywords = preg_split('~\s+~', $request->input('keyword'));
+        $events = Event::select('*');
+        foreach ($keywords as $keyword) {
+            $events
+                ->orWhere('name', 'LIKE', sprintf('%%%s%%', $keyword))
+                ->orWhere('event_location_human', 'LIKE', sprintf('%%%s%%', $keyword))
+                ->orWhere(DB::raw('DATE_FORMAT(`date`, \'%d.%m.%Y\')'), 'LIKE', sprintf('%%%s%%', $keyword));
+        }
+        $events = $events->limit(100)->get();
+        
+        return response()->json(['success' => true, 'data' => $events]);
     }
 }
