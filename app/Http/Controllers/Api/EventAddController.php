@@ -16,4 +16,24 @@ class EventAddController extends Controller
     {
         return response()->json(['success' => true]);
     }
+    
+    /**
+     * Event category validation
+     * @param CategoryRequest $request
+     * @return string
+     */
+    public function category(Requests\Events\Add\CategoryRequest $request)
+    {
+        return response()->json(['success' => true]);
+    }
+    
+    /**
+     * Event date and place validation
+     * @param DatePlaceRequest $request
+     * @return string
+     */
+    public function datePlace(Requests\Events\Add\DatePlaceRequest $request)
+    {
+        return response()->json(['success' => true]);
+    }
 }

@@ -296,9 +296,14 @@ class EventsController extends Controller
         $events = Event::select('*');
         foreach ($keywords as $keyword) {
             $events
-                ->orWhere('name', 'LIKE', sprintf('%%%s%%', $keyword))
-                ->orWhere('event_location_human', 'LIKE', sprintf('%%%s%%', $keyword))
-                ->orWhere(DB::raw('DATE_FORMAT(`date`, \'%d.%m.%Y\')'), 'LIKE', sprintf('%%%s%%', $keyword));
+                ->where(function($query) use($keyword) {
+                    $query->where('date', '>', date('Y-m-d H:i:s'));
+                    $query->where(function($query) use($keyword) {
+                        $query->orWhere('name', 'LIKE', sprintf('%%%s%%', $keyword));
+                        $query->orWhere('event_location_human', 'LIKE', sprintf('%%%s%%', $keyword));
+                        $query->orWhere(DB::raw('DATE_FORMAT(`date`, \'%d.%m.%Y\')'), 'LIKE', sprintf('%%%s%%', $keyword));
+                    });
+                });
         }
         $events = $events->limit(100)->get();
         
