@@ -27,7 +27,7 @@ class GeneralInfoRequest extends Request
      * Get the validation rules that apply to the request.
      * @return array
      */
-    public function rules()
+    public static function rules()
     {
         return [
             'title' => 'required|string|min:3|max:120',

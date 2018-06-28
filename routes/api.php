@@ -24,6 +24,7 @@ Route::group(['namespace' => 'Api'], function () {
         Route::post('/add/category', 'EventAddController@category');
         Route::post('/add/date-place', 'EventAddController@datePlace');
         Route::post('/add/tickets', 'EventAddController@tickets');
+        Route::post('/add', 'EventAddController@add');
     });
     
     Route::get('/categories', 'CategoriesController@index');

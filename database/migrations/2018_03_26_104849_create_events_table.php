@@ -19,10 +19,10 @@ class CreateEventsTable extends Migration
             $table->unsignedInteger('category_id');
             $table->unsignedInteger('user_id');
             $table->string('name');
-            $table->string('event_location_human');
-            $table->json('event_location_latlng');
-            $table->string('event_destination_human')->nullable();
-            $table->json('event_destination_latlng')->nullable();
+            $table->string('destination');
+            $table->json('destination_latlng');
+            $table->string('dispatch')->nullable();
+            $table->json('dispatch_latlng')->nullable();
             $table->dateTime('date');
             $table->unsignedTinyInteger('is_top')->default(0);
             $table->unsignedTinyInteger('is_active')->default(1);

@@ -19,7 +19,7 @@ class DatePlaceRequest extends Request
      * Get the validation rules that apply to the request.
      * @return array
      */
-    public function rules()
+    public static function rules()
     {
         return [
             'timestamp' => 'required|int',
@@ -29,9 +29,6 @@ class DatePlaceRequest extends Request
             'event_dispatch' => 'nullable|required_if:category_id,18|min:3',
             'event_dispatch_latlng.lat' => 'nullable|required_with:event_dispatch_latlng.lng|numeric|between:-90.00,90.00',
             'event_dispatch_latlng.lng' => 'nullable|required_with:event_dispatch_latlng.lat|numeric|between:-180.00,180.00',
-            'event_meet_place' => 'required|min:3',
-            'event_meet_place_latlng.lat' => 'nullable|required_with:event_meet_place_latlng.lng|numeric|between:-90.00,90.00',
-            'event_meet_place_latlng.lng' => 'nullable|required_with:event_meet_place_latlng.lat|numeric|between:-180.00,180.00',
             'category_id' => 'required|int|exists:categories,id',
         ];
     }

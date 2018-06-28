@@ -19,7 +19,7 @@ class TicketsRequest extends Request
      * Get the validation rules that apply to the request.
      * @return array
      */
-    public function rules()
+    public static function rules()
     {
         return [
             'bought' => 'required|int|min:0|max:1',
