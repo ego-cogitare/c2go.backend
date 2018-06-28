@@ -36,4 +36,14 @@ class EventAddController extends Controller
     {
         return response()->json(['success' => true]);
     }
+    
+    /**
+     * Event tickets validation
+     * @param TicketsRequest $request
+     * @return string
+     */
+    public function tickets(Requests\Events\Add\TicketsRequest $request)
+    {
+        return response()->json(['success' => true]);
+    }
 }
