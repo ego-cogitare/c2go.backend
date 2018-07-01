@@ -17,8 +17,8 @@ Route::group(['namespace' => 'Api'], function () {
     Route::group(['prefix' => 'events'], function() {
         Route::get('/', 'EventsController@index');
         Route::get('/proposals/{id}', 'EventsController@proposals');
-        Route::get('/details/{event}/user/{user}', 'EventsController@details');
-        Route::get('/general/{event}/user/{user}', 'EventsController@general');
+        Route::get('/details/{proposal}', 'EventsController@details');
+        Route::get('/general/{proposal}', 'EventsController@general');
         Route::get('/autocomplete', 'EventsController@autocomplete');
     });
     
@@ -55,7 +55,7 @@ Route::group(['namespace' => 'Api'], function () {
                 Route::get('/requests', 'EventsController@showUserRequests');
                 
                 /** Make event {event} request to the user {user} */
-                Route::post('/requests/{event}/user/{user}', 'EventsController@storeRequest');
+                Route::post('/requests/{proposal}', 'EventsController@storeRequest');
                 
                 /** Show details */
                 Route::get('/accept/{event}', 'EventsController@showEventAccept');

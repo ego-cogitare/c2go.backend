@@ -111,9 +111,9 @@ class EventAddController extends Controller
             $event = Event::findOrFail($data['event_id']);
         }
         
-        /** If phone number is provided and it is not in the user's phones list */
-        if ($data['telephone'] && !Auth::user()->hasPhone($data['telephone'])) {
-            Auth::user()->addPhone($data['telephone']);
+        /** If phone number is provided and user have no phone yet */
+        if ($data['telephone'] && Auth::user()->getPhone() === '') {
+            Auth::user()->setPhone($data['telephone']);
         }
         
         /** @var EventProposal $eventProposal */

@@ -92,7 +92,6 @@ class User extends Authenticatable
         foreach ($settings as $section => $value) {
             switch ($section) {
                 case 'location':
-                case 'phone':
                     $settings[$section] = json_decode($value);
                     break;
                 
@@ -121,6 +120,10 @@ class User extends Authenticatable
                             ->toArray();*/
                     }
                     break;
+                    
+                case 'phone':
+                    $settings[$section] = $value;
+                    break;
             }
         }
         
@@ -134,23 +137,23 @@ class User extends Authenticatable
     }
     
     /**
-     * Get user phones list
-     * @return string[] 
+     * Get user phone
+     * @return string 
      */
-    public function phones(): array
+    public function getPhone(): string
     {
-        $phones = UserSetting::where([
+        $phone = UserSetting::where([
             'user_id' => $this->id,
             'section' => 'phone',
         ])
         ->first();
         
         /** If the user has no any saved phones */
-        if ($phones === null) {
-            return [];
+        if ($phone === null) {
+            return '';
         }
         
-        return json_decode($phones->value);
+        return $phone->value;
     }
     
     /**
@@ -158,20 +161,14 @@ class User extends Authenticatable
      * @param string $phone
      * @return bool
      */
-    public function hasPhone(string $phone): bool
+    public function isPhone(string $phone): bool
     {
-        /** @var string[] $phones */
-        $phones = $this->phones();
-        
-        if (count($phones) === 0) {
-            return false;
-        }
+        /** @var string $phone */
+        $userPhone = $this->getPhone();
 
-        foreach ($phones as $storedPhone) {
-            if (strlen($storedPhone) >= 10 
-                && preg_match('/' . str_replace('+', '\+', $phone) . '$/', $storedPhone)) {
-                return true;
-            }
+        if (strlen($userPhone) >= 10 
+            && preg_match('/' . str_replace('+', '\+', $phone) . '$/', $userPhone)) {
+            return true;
         }
         
         return false;
@@ -182,23 +179,18 @@ class User extends Authenticatable
      * @param string $phone
      * @return bool
      */
-    public function addPhone(string $phone): bool
+    public function setPhone(string $phone): bool
     {
-        $phones = $this->phones();
-        
-        if ($this->hasPhone($phone)) {
+        if ($this->isPhone($phone)) {
             return false;
         }
         
-        /** @var string[] $phones */
-        $phones[] = $phone;
-        
-        UserSetting::where([
+        UserSetting::updateOrCreate([
+            'value' => $phone
+        ], [
             'user_id' => $this->id,
             'section' => 'phone',
-        ])
-        ->update([
-            'value' => json_encode($phones)
+            'value' => $phone
         ]);
         
         return true;

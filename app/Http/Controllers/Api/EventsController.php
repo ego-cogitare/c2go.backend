@@ -141,13 +141,13 @@ class EventsController extends Controller
         ]);
     }
     
-    public function details(Request $request, $event, $user)
+    public function details(Request $request, $proposal)
     {
         $limit = $request->get('limit', 5);
         $offset = $request->get('offset', 0);
         
         $event = EventProposal::with([
-            'event' => function($query) use($user) {
+            'event' => function($query) {
                 $query->with([
                     'category' => function($query) {
                         $query->with(['parent']);
@@ -162,10 +162,7 @@ class EventsController extends Controller
                 ]);
             },
         ])
-        ->where([
-            'event_id' => $event,
-            'user_id' => $user,
-        ])
+        ->where('id', $proposal)
         ->first();
         
         if (empty($event)) {
@@ -178,10 +175,10 @@ class EventsController extends Controller
         ]);
     }
     
-    public function general($event, $user)
+    public function general($proposal)
     {
         $event = EventProposal::with([
-            'event' => function($query) use($user) {
+            'event' => function($query) {
                 $query->with([
                     'category' => function($query) {
                         $query->with(['parent']);
@@ -190,10 +187,7 @@ class EventsController extends Controller
             }, 
             'user',
         ])
-        ->where([
-            'event_id' => $event,
-            'user_id' => $user,
-        ])
+        ->where('id', $proposal)
         ->first();
         
         if (empty($event)) {
@@ -206,21 +200,25 @@ class EventsController extends Controller
         ]);
     }
     
-    public function storeRequest(Request $request, $event, $user)
+    public function storeRequest(Request $request, $proposal)
     {
         $request->request->add([
-            'event_user_id' => intval($user), 
-            'event_id' => intval($event),
+            'event_proposals_id' => $proposal,
             'user_id' => Auth::user()->id,
         ]);
         
-        $data = $request->all();
+        $data = $request->only([
+            'event_proposals_id',
+            'user_id',
+            'message',
+        ]);
         
         $request->validate([
-            'event_user_id' => 'required|integer|exists:users,id',
+            'event_proposals_id' => 'required|integer|exists:event_proposals,id|unique:event_requests,event_proposals_id,NULL,id,user_id,' . Auth::user()->id,
             'user_id' => 'required|integer|exists:users,id',
-            'event_id' => 'required|integer|exists:events,id',
             'message' => 'required|string|min:10|max:120',
+        ], [
+            'event_proposals_id.unique' => 'You already send request for this user and event.'
         ]);
         
         $event_request = EventRequest::create($data);

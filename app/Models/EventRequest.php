@@ -16,9 +16,8 @@ class EventRequest extends Model
      * @var array
      */
     protected $fillable = [
-        'event_user_id',
+        'event_proposals_id',
         'user_id',
-        'event_id',
         'message',
         'state',
         'is_active',
