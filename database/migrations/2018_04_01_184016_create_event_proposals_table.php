@@ -18,8 +18,11 @@ class CreateEventProposalsTable extends Migration
             $table->timestamps();
             $table->unsignedInteger('event_id');
             $table->unsignedInteger('user_id');
-            $table->decimal('price', 8, 2);
+            $table->unsignedTinyInteger('tickets_bought')->default(0);
+            $table->decimal('price', 8, 2)->nullable();
             $table->string('message', 1024);
+            $table->string('description', 1024);
+            $table->string('url', 64);
             $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unique(['event_id', 'user_id']);

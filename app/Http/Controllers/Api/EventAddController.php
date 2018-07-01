@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Event;
 use App\Models\EventProposal;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class EventAddController extends Controller
 {
@@ -91,43 +91,48 @@ class EventAddController extends Controller
     public function add(Requests\Events\Add\AddRequest $request)
     {
         /** @var array $data */
-        $data = $this->all();
+        $data = $request->all();
         
         /** Creating new event scenario */
         if (empty($data['event_id'])) {
+            
+            /** @var Event $event */
             $event = Event::create([
                 'category_id'        => $data['category_id'],
                 'user_id'            => Auth::user()->id,
                 'name'               => $data['title'],
-                'description'        => $data['description'],
-                'url'                => $data['url'],
                 'date'               => Carbon::createFromTimestamp($data['timestamp'])->toDateTimeString(),
                 'destination'        => $data['event_destination'],
                 'destination_latlng' => json_encode($data['event_destination_latlng']),
                 'dispatch'           => $data['event_destination'],
                 'dispatch_latlng'    => json_encode($data['event_dispatch_latlng']),
-                
             ]);
-            
-            EventProposal::create([
-                'event_id' => $event->id,
-                'user_id'  => $event->user_id,
-                'price'    => $data['price'],
-                'message'  => $data['meet_place'],
-            ]);
-            
-            /** If phone number provided and it is not in the user's phones list */
-//            if ($data['telephone'] && !Auth::user()->hasPhone($data['telephone'])) {
-//                Auth::user()->addPhone($data['telephone']);
-//            }
-        /** Add event proposal for already existing event */
         } else {
-            
+            $event = Event::findOrFail($data['event_id']);
         }
+        
+        /** If phone number is provided and it is not in the user's phones list */
+        if ($data['telephone'] && !Auth::user()->hasPhone($data['telephone'])) {
+            Auth::user()->addPhone($data['telephone']);
+        }
+        
+        /** @var EventProposal $eventProposal */
+        $eventProposal = EventProposal::create([
+            'event_id'       => $event->id,
+            'user_id'        => Auth::user()->id,
+            'tickets_bought' => $data['bought'],
+            'price'          => $data['price'],
+            'message'        => $data['meet_place'],
+            'description'    => $data['description'],
+            'url'            => $data['url'],
+        ]);
         
         return response()->json([
             'success' => true,
-            'data' => $request->all()
+            'data' => [
+                'event' => $event,
+                'proposal' => $eventProposal,
+            ]
         ]);
     }
 }

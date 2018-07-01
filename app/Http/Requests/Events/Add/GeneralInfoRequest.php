@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Events\Add;
 
 use App\Http\Requests\Request;
+use Illuminate\Support\Facades\Auth;
 
 class GeneralInfoRequest extends Request
 {
@@ -18,8 +19,7 @@ class GeneralInfoRequest extends Request
     public function messages()
     {
         return [
-//            'title.required' => 'A title is required',
-//            'body.required'  => 'A message is required',
+            'event_id.unique' => 'You already have proposal for the event.',
         ];
     }
 
@@ -31,7 +31,7 @@ class GeneralInfoRequest extends Request
     {
         return [
             'title' => 'required|string|min:3|max:120',
-            'event_id' => 'nullable|int|exists:events,id',
+            'event_id' => 'nullable|int|exists:events,id|unique:event_proposals,event_id,NULL,id,user_id,' . Auth::user()->id,
             'description' => 'required|string|min:10|max:120',
             'url' => 'nullable|url',
         ];

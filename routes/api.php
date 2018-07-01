@@ -20,11 +20,6 @@ Route::group(['namespace' => 'Api'], function () {
         Route::get('/details/{event}/user/{user}', 'EventsController@details');
         Route::get('/general/{event}/user/{user}', 'EventsController@general');
         Route::get('/autocomplete', 'EventsController@autocomplete');
-        Route::post('/add/general', 'EventAddController@general');
-        Route::post('/add/category', 'EventAddController@category');
-        Route::post('/add/date-place', 'EventAddController@datePlace');
-        Route::post('/add/tickets', 'EventAddController@tickets');
-        Route::post('/add', 'EventAddController@add');
     });
     
     Route::get('/categories', 'CategoriesController@index');
@@ -56,14 +51,21 @@ Route::group(['namespace' => 'Api'], function () {
         });
         Route::group(['middleware' => CheckRegCompleteness::class], function() {
             Route::group(['prefix' => 'events'], function() {
-                // Get curent logged in user event requests
+                /** Get current logged in user event requests */
                 Route::get('/requests', 'EventsController@showUserRequests');
                 
-                // Make event {event} request to the user {user}
+                /** Make event {event} request to the user {user} */
                 Route::post('/requests/{event}/user/{user}', 'EventsController@storeRequest');
                 
-                // Show details
+                /** Show details */
                 Route::get('/accept/{event}', 'EventsController@showEventAccept');
+                
+                /** Add new event */
+                Route::post('/add/general', 'EventAddController@general');
+                Route::post('/add/category', 'EventAddController@category');
+                Route::post('/add/date-place', 'EventAddController@datePlace');
+                Route::post('/add/tickets', 'EventAddController@tickets');
+                Route::post('/add', 'EventAddController@add');
             });
             Route::get('/check/restricted', 'CheckController@restricted');
             Route::get('/faq', 'FAQController@index');
