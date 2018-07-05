@@ -240,12 +240,13 @@ class EventsController extends Controller
                 'event_requests.state',
                 'event_requests.message',
                 'event_requests.user_id',
-                'event_requests.event_user_id',
+                'event_proposals.user_id AS author_id',
                 \DB::raw('DATE_FORMAT(events.date, \'%d.%m.%Y\') AS date')
             )
-            ->leftJoin('events', 'events.id', '=', 'event_requests.event_id')
+            ->leftJoin('event_proposals', 'event_proposals.id', '=', 'event_requests.event_proposals_id')
+            ->leftJoin('events', 'events.id', '=', 'event_proposals.event_id')
             ->where('event_requests.is_active', 1)
-            ->where('event_requests.event_user_id', Auth::user()->id)
+            ->where('event_proposals.user_id', Auth::user()->id)
             ->orderBy('events.date', 'asc')
             ->get();
                 
@@ -255,28 +256,21 @@ class EventsController extends Controller
         ]);
     }
     
-    public function showEventAccept($event) 
+    public function showEventAccept($request) 
     {
-        $data = EventRequest::with(['author', 'user', 'event' => function($query) {
-                $query->with('category');
+        $data = EventRequest::with(['user',
+            'proposal' => function($query) {
+                $query->with(['event' => function($query) {
+                    $query->with(['category']);
+                }]);
             }])
-            ->select(
-                'event_requests.*', 
-                'event_proposals.price', 
-                'event_proposals.message as request_message'
-            )
-            ->leftJoin('event_proposals', function($join) {
-                $join->on('event_proposals.user_id', '=', 'event_requests.event_user_id');
-                $join->on('event_proposals.event_id', '=', 'event_requests.event_id');
-            })
             ->where([
-                'event_requests.id' => $event,
+                'event_requests.id' => $request,
                 'event_requests.is_active' => 1,
-                'event_requests.event_user_id' => Auth::user()->id
             ])
             ->first();
         
-        if (empty($data)) {
+        if ($data === null) {
             return response()->json(['success' => false], 404);
         }
         

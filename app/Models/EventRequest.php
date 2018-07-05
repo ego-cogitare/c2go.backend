@@ -24,14 +24,6 @@ class EventRequest extends Model
     ];
     
     /**
-     * Author of the event
-     */
-    public function author() 
-    {
-        return $this->belongsTo('App\Models\User', 'event_user_id');
-    }
-    
-    /**
      * Author of the request
      */
     public function user() 
@@ -39,8 +31,11 @@ class EventRequest extends Model
         return $this->belongsTo('App\Models\User', 'user_id');
     }
     
-    public function event() 
+    /**
+     * Author of the request
+     */
+    public function proposal() 
     {
-        return $this->belongsTo('App\Models\Event');
+        return $this->hasOne('App\Models\EventProposal', 'id', 'event_proposals_id');
     }
 }
