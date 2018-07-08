@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\Request;
-use Illuminate\Support\Facades\Auth;
 
 class EventSaveRequest extends Request
 {

@@ -83,11 +83,24 @@ class User extends Authenticatable
         $this->attributes['birth_date'] = Carbon::createFromFormat('d.m.Y', $value)->format('Y-m-d');
     }
     
-    public function getSettingsAttribute() 
+    /**
+     * Get user settings
+     */
+    protected function getUserSettings()
     {
-        $settings = UserSetting::where('user_id', $this->id)
+        return UserSetting::where('user_id', $this->id)
             ->get()
             ->pluck('value', 'section');
+    }
+    
+    /**
+     * Get additional model "settings" field
+     * @return array
+     */
+    public function getSettingsAttribute() 
+    {
+        /** @var array $settings */
+        $settings = $this->getUserSettings();
         
         foreach ($settings as $section => $value) {
             switch ($section) {
@@ -114,10 +127,6 @@ class User extends Authenticatable
                             ->orderBy('order', 'ASC')
                             ->get()
                             ->toArray();
-                        
-                        /*$settings[$section] = Category::whereIn('id', $data->categories)
-                            ->get()
-                            ->toArray();*/
                     }
                     break;
                     
@@ -194,5 +203,15 @@ class User extends Authenticatable
         ]);
         
         return true;
+    }
+    
+    /**
+     * Get current logged in user account type
+     */
+    public function getAccountType()
+    {
+        $settings = $this->getUserSettings();
+        
+        return (int)$settings['profile_type'] ?? null;
     }
 }

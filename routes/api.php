@@ -14,6 +14,11 @@ use App\Http\Middleware\CheckRegCompleteness;
 */
 
 Route::group(['namespace' => 'Api'], function () {
+    /**
+     * Not logged in user requests
+     */
+    Route::get('/categories', 'CategoriesController@index');
+    Route::get('/category/{category}', 'CategoriesController@show');
     Route::group(['prefix' => 'events'], function() {
         Route::get('/', 'EventsController@index');
         Route::get('/proposals/{id}', 'EventsController@proposals');
@@ -21,10 +26,6 @@ Route::group(['namespace' => 'Api'], function () {
         Route::get('/general/{proposal}', 'EventsController@general');
         Route::get('/autocomplete', 'EventsController@autocomplete');
     });
-    
-    Route::get('/categories', 'CategoriesController@index');
-    Route::get('/category/{category}', 'CategoriesController@show');
-    
     Route::group(['prefix' => 'auth'], function() {
         Route::post('/login', 'AuthController@login')->name('auth_login');
         Route::get('/refresh-token', 'AuthController@refreshToken');
@@ -43,6 +44,10 @@ Route::group(['namespace' => 'Api'], function () {
         });
     });
     
+    
+    /**
+     * Need authorization to perform a request
+     */
     Route::group(['middleware' => ['jwt.auth']], function() {
         Route::group(['prefix' => 'user'], function() {
             Route::post('/progress/{progress}', 'UserController@updateProgress');
@@ -57,15 +62,24 @@ Route::group(['namespace' => 'Api'], function () {
                 /** Make event {event} request to the user {user} */
                 Route::post('/requests/{proposal}', 'EventsController@storeRequest');
                 
-                /** Show details */
-                Route::get('/accept/{event}', 'EventsController@showEventAccept');
-                
                 /** Add new event */
                 Route::post('/add/general', 'EventAddController@general');
                 Route::post('/add/category', 'EventAddController@category');
                 Route::post('/add/date-place', 'EventAddController@datePlace');
                 Route::post('/add/tickets', 'EventAddController@tickets');
                 Route::post('/add', 'EventAddController@add');
+                
+                /** Get upcoming events list */
+                Route::get('/upcoming', 'EventsController@upcomingEvents');
+                
+                /** Accept event request */
+                Route::post('/requests/{requestId}/accept', 'EventsController@eventAccept');
+                
+                /** Decline event request */
+                Route::post('/requests/{requestId}/reject', 'EventsController@eventReject');
+                
+                /** Show event request details */
+                Route::get('/requests/{requestId}/overview', 'EventsController@requestOverview');
             });
             Route::get('/check/restricted', 'CheckController@restricted');
             Route::get('/faq', 'FAQController@index');

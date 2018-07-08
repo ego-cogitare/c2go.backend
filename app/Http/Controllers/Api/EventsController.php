@@ -12,6 +12,9 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\AutocompleteRequest;
+use App\Http\Requests\EventUpdateStateRequest;
+use App\Interfaces\IAccountType;
+use App\Interfaces\IEventStates;
 use DB;
 
 class EventsController extends Controller
@@ -200,6 +203,12 @@ class EventsController extends Controller
         ]);
     }
     
+    /**
+     * Send event request to disabled user
+     * @param Request $request
+     * @param int $proposal
+     * @return string
+     */
     public function storeRequest(Request $request, $proposal)
     {
         $request->request->add([
@@ -247,6 +256,7 @@ class EventsController extends Controller
             ->leftJoin('events', 'events.id', '=', 'event_proposals.event_id')
             ->where('event_requests.is_active', 1)
             ->where('event_proposals.user_id', Auth::user()->id)
+            ->whereIn('state', [IEventStates::STATE_NEW, IEventStates::STATE_REJECTED])
             ->orderBy('events.date', 'asc')
             ->get();
                 
@@ -256,7 +266,12 @@ class EventsController extends Controller
         ]);
     }
     
-    public function showEventAccept($request) 
+    /**
+     * Event information on event accept page
+     * @param int $requestId
+     * @return string
+     */
+    public function requestOverview($requestId) 
     {
         $data = EventRequest::with(['user',
             'proposal' => function($query) {
@@ -265,7 +280,7 @@ class EventsController extends Controller
                 }]);
             }])
             ->where([
-                'event_requests.id' => $request,
+                'event_requests.id' => $requestId,
                 'event_requests.is_active' => 1,
             ])
             ->first();
@@ -300,5 +315,76 @@ class EventsController extends Controller
         $events = $events->limit(100)->get();
         
         return response()->json(['success' => true, 'data' => $events]);
+    }
+    
+    /**
+     * Return upcoming events list for disabled user
+     */
+    public function upcomingEvents(Request $request)
+    {
+        if (Auth::user()->getAccountType() !== IAccountType::DISABLED) {
+            return response()->json(['success' => false], 403);
+        }
+        
+        $events = EventRequest::with(['user'])
+            ->select(
+                'events.name',
+                'events.destination',
+                'events.dispatch',
+                'event_requests.id', 
+                'event_requests.state', 
+                'event_requests.user_id',
+                'event_requests.event_proposals_id AS proposal_id',
+                'event_proposals.user_id AS author_id',
+                \DB::raw('DATE_FORMAT(events.date, \'%d.%m.%Y\') AS date')
+            )
+            ->leftJoin('event_proposals', 'event_proposals.id', '=', 'event_requests.event_proposals_id')
+            ->leftJoin('events', 'events.id', '=', 'event_proposals.event_id')
+            ->where('event_requests.is_active', 1)
+            ->where('event_proposals.user_id', Auth::user()->id)
+            ->where('state', IEventStates::STATE_ACCEPTED)
+            ->orderBy('events.date', 'asc')
+            ->get();
+                
+        return response()->json([
+            'success' => true,
+            'data' => $events
+        ]);
+    }
+    
+    /**
+     * Set event request state to accepted
+     */
+    public function eventAccept(Requests\EventUpdateStateRequest $request, $requestId)
+    {
+        $request->request->add([
+            'request_id' => $requestId,
+        ]);
+        
+        EventRequest::find($request)->update([
+            'state' => IEventStates::STATE_ACCEPTED
+        ]);
+        
+        return response()->json([
+            'success' => true
+        ]);
+    }
+    
+    /**
+     * Set event request state to declined
+     */
+    public function eventReject(Requests\EventUpdateStateRequest $request, $requestId)
+    {
+        $request->request->add([
+            'request_id' => $requestId,
+        ]);
+        
+        EventRequest::find($request)->update([
+            'state' => IEventStates::STATE_REJECTED
+        ]);
+        
+        return response()->json([
+            'success' => true
+        ]);
     }
 }
