@@ -12,7 +12,6 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\AutocompleteRequest;
-use App\Http\Requests\EventUpdateStateRequest;
 use App\Interfaces\IAccountType;
 use App\Interfaces\IEventStates;
 use DB;
@@ -354,14 +353,26 @@ class EventsController extends Controller
     
     /**
      * Set event request state to accepted
+     * @param int $requestId Event request id
+     * @return string
      */
-    public function eventAccept(Requests\EventUpdateStateRequest $request, $requestId)
+    public function eventAccept($requestId)
     {
-        $request->request->add([
-            'request_id' => $requestId,
-        ]);
+        /** @var \App\Models\EventRequest|null $eventRequest */
+        $eventRequest = EventRequest::where([
+            'id' => $requestId,
+            'state' => IEventStates::STATE_NEW
+        ])
+        ->first();
         
-        EventRequest::find($request)->update([
+        if ($eventRequest === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Event request not found'
+            ], 404);
+        }
+        
+        $eventRequest->update([
             'state' => IEventStates::STATE_ACCEPTED
         ]);
         
@@ -372,14 +383,26 @@ class EventsController extends Controller
     
     /**
      * Set event request state to declined
+     * @param int $requestId Event request id
+     * @return string
      */
-    public function eventReject(Requests\EventUpdateStateRequest $request, $requestId)
+    public function eventReject($requestId)
     {
-        $request->request->add([
-            'request_id' => $requestId,
-        ]);
+        /** @var \App\Models\EventRequest|null $eventRequest */
+        $eventRequest = EventRequest::where([
+            'id' => $requestId,
+            'state' => IEventStates::STATE_NEW
+        ])
+        ->first();
         
-        EventRequest::find($request)->update([
+        if ($eventRequest === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Event request not found'
+            ], 404);
+        }
+        
+        $eventRequest->update([
             'state' => IEventStates::STATE_REJECTED
         ]);
         
