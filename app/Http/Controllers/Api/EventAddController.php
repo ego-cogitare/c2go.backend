@@ -104,8 +104,8 @@ class EventAddController extends Controller
                 'date'               => Carbon::createFromTimestamp($data['timestamp'])->toDateTimeString(),
                 'destination'        => $data['event_destination'],
                 'destination_latlng' => json_encode($data['event_destination_latlng']),
-                'dispatch'           => $data['event_destination'],
-                'dispatch_latlng'    => json_encode($data['event_dispatch_latlng']),
+                'dispatch'           => $data['event_dispatch'],
+                'dispatch_latlng'    => isset($data['event_dispatch_latlng']) ? json_encode($data['event_dispatch_latlng']) : '{}',
             ]);
         } else {
             $event = Event::findOrFail($data['event_id']);
