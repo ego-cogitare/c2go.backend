@@ -95,7 +95,6 @@ class EventAddController extends Controller
         
         /** Creating new event scenario */
         if (empty($data['event_id'])) {
-            
             /** @var Event $event */
             $event = Event::create([
                 'category_id'        => $data['category_id'],
@@ -103,7 +102,7 @@ class EventAddController extends Controller
                 'name'               => $data['title'],
                 'date'               => Carbon::createFromTimestamp($data['timestamp'])->toDateTimeString(),
                 'destination'        => $data['event_destination'],
-                'destination_latlng' => json_encode($data['event_destination_latlng']),
+                'destination_latlng' => isset($data['event_destination_latlng']) ? json_encode($data['event_destination_latlng']) : '{}',
                 'dispatch'           => $data['event_dispatch'],
                 'dispatch_latlng'    => isset($data['event_dispatch_latlng']) ? json_encode($data['event_dispatch_latlng']) : '{}',
             ]);
