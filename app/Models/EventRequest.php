@@ -38,4 +38,12 @@ class EventRequest extends Model
     {
         return $this->hasOne('App\Models\EventProposal', 'id', 'event_proposals_id');
     }
+    
+    /**
+     * Author of the request
+     */
+    public function proposer() 
+    {
+        return $this->hasManyThrough('App\Models\User', 'App\Models\EventProposal', 'id', 'id', 'event_proposals_id', 'user_id')->limit(1);
+    }
 }

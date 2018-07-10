@@ -242,20 +242,62 @@ class EventsController extends Controller
      */
     public function showUserRequests() 
     {
-        $events = EventRequest::with(['user'])
+        $events = EventRequest::with(['user', 'proposer'])
+        ->select(
+            'event_requests.id', 
+            'event_requests.state',
+            'event_requests.message',
+            'event_requests.user_id',
+            'event_requests.event_proposals_id',
+            'event_proposals.user_id AS author_id',
+            \DB::raw('DATE_FORMAT(events.date, \'%d.%m.%Y\') AS date')
+        )
+        ->leftJoin('event_proposals', 'event_proposals.id', '=', 'event_requests.event_proposals_id')
+        ->leftJoin('events', 'events.id', '=', 'event_proposals.event_id')
+        ->where('event_requests.is_active', 1)
+        ->whereIn('state', [IEventStates::STATE_NEW, IEventStates::STATE_REJECTED])
+        ->where(function($query) {
+            $query->orWhere('event_proposals.user_id', Auth::user()->id);
+            $query->orWhere('event_requests.user_id', Auth::user()->id);
+        })
+        ->orderBy('events.date', 'asc')
+        ->get();
+                
+        return response()->json([
+            'success' => true,
+            'data' => $events
+        ]);
+    }
+    
+    /**
+     * Return upcoming events list for disabled user
+     * @param Request $request
+     * @return string
+     */
+    public function upcomingEvents(Request $request)
+    {
+        $events = EventRequest::with(['user', 'proposer'])
             ->select(
+                'events.name',
+                'events.destination',
+                'events.dispatch',
                 'event_requests.id', 
-                'event_requests.state',
-                'event_requests.message',
+                'event_requests.state', 
                 'event_requests.user_id',
+                'event_requests.event_proposals_id',
+                'event_requests.event_proposals_id AS proposal_id',
                 'event_proposals.user_id AS author_id',
                 \DB::raw('DATE_FORMAT(events.date, \'%d.%m.%Y\') AS date')
             )
             ->leftJoin('event_proposals', 'event_proposals.id', '=', 'event_requests.event_proposals_id')
             ->leftJoin('events', 'events.id', '=', 'event_proposals.event_id')
             ->where('event_requests.is_active', 1)
-            ->where('event_proposals.user_id', Auth::user()->id)
-            ->whereIn('state', [IEventStates::STATE_NEW, IEventStates::STATE_REJECTED])
+            ->where(function($query) {
+                $query->orWhere('event_proposals.user_id', Auth::user()->id);
+                $query->orWhere('event_requests.user_id', Auth::user()->id);
+            })
+            ->where('state', IEventStates::STATE_ACCEPTED)
+            ->where('date', '>', date('Y-m-d H:i:s'))
             ->orderBy('events.date', 'asc')
             ->get();
                 
@@ -317,41 +359,6 @@ class EventsController extends Controller
     }
     
     /**
-     * Return upcoming events list for disabled user
-     */
-    public function upcomingEvents(Request $request)
-    {
-        if (Auth::user()->getAccountType() !== IAccountType::DISABLED) {
-            return response()->json(['success' => false], 403);
-        }
-        
-        $events = EventRequest::with(['user'])
-            ->select(
-                'events.name',
-                'events.destination',
-                'events.dispatch',
-                'event_requests.id', 
-                'event_requests.state', 
-                'event_requests.user_id',
-                'event_requests.event_proposals_id AS proposal_id',
-                'event_proposals.user_id AS author_id',
-                \DB::raw('DATE_FORMAT(events.date, \'%d.%m.%Y\') AS date')
-            )
-            ->leftJoin('event_proposals', 'event_proposals.id', '=', 'event_requests.event_proposals_id')
-            ->leftJoin('events', 'events.id', '=', 'event_proposals.event_id')
-            ->where('event_requests.is_active', 1)
-            ->where('event_proposals.user_id', Auth::user()->id)
-            ->where('state', IEventStates::STATE_ACCEPTED)
-            ->orderBy('events.date', 'asc')
-            ->get();
-                
-        return response()->json([
-            'success' => true,
-            'data' => $events
-        ]);
-    }
-    
-    /**
      * Set event request state to accepted
      * @param int $requestId Event request id
      * @return string
@@ -359,17 +366,35 @@ class EventsController extends Controller
     public function eventAccept($requestId)
     {
         /** @var \App\Models\EventRequest|null $eventRequest */
-        $eventRequest = EventRequest::where([
-            'id' => $requestId,
-            'state' => IEventStates::STATE_NEW
-        ])
-        ->first();
+        $eventRequest = EventRequest::with(['proposer'])
+            ->where([
+                'id' => $requestId,
+                'state' => IEventStates::STATE_NEW
+            ])
+            ->first();
         
         if ($eventRequest === null) {
             return response()->json([
                 'success' => false,
                 'message' => 'Event request not found'
             ], 404);
+        }
+        
+        /** @var \App\Models\User $proposer */
+        $proposer = $eventRequest->proposer[0] ?? null;
+        
+        if ($proposer === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Proposer user not found'
+            ], 400);
+        }
+        
+        if ($proposer->email !== Auth::user()->email) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You have no permissions to accept this event'
+            ], 409);
         }
         
         $eventRequest->update([
