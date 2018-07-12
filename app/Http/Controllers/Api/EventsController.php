@@ -248,7 +248,7 @@ class EventsController extends Controller
         ->select(
             '*',
             'event_requests.id AS request_id',
-            'event_requests.message AS request_message',
+            'event_requests.message AS message',
             'event_requests.user_id AS requestor_user_id',
             \DB::raw('DATE_FORMAT(events.date, \'%d.%m.%Y\') AS date')
         )
