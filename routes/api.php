@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Middleware\CheckRegCompleteness;
+use App\Http\Middleware\DisabledUsersFilter;
+use App\Http\Middleware\NormalUsersFilter;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,27 +61,32 @@ Route::group(['namespace' => 'Api'], function () {
                 /** Get current logged in user event requests */
                 Route::get('/requests', 'EventsController@showUserRequests');
                 
-                /** Make event {event} request to the user {user} */
-                Route::post('/requests/{proposal}', 'EventsController@storeRequest');
+                /** Make event request to the user proposal */
+                Route::group(['middleware' => NormalUsersFilter::class], function() {
+                    Route::post('/requests/{proposal}', 'EventsController@storeRequest');
+                });
                 
                 /** Add new event */
-                Route::post('/add/general', 'EventAddController@general');
-                Route::post('/add/category', 'EventAddController@category');
-                Route::post('/add/date-place', 'EventAddController@datePlace');
-                Route::post('/add/tickets', 'EventAddController@tickets');
-                Route::post('/add', 'EventAddController@add');
+                Route::group(['middleware' => DisabledUsersFilter::class], function() {
+                    /** Event add validation URLs */
+                    Route::post('/add/general', 'EventAddController@general');
+                    Route::post('/add/category', 'EventAddController@category');
+                    Route::post('/add/date-place', 'EventAddController@datePlace');
+                    Route::post('/add/tickets', 'EventAddController@tickets');
+                    Route::post('/add', 'EventAddController@add');
+                    
+                    /** Accept event request */
+                    Route::post('/requests/{requestId}/accept', 'EventsController@eventAccept');
+
+                    /** Decline event request */
+                    Route::post('/requests/{requestId}/reject', 'EventsController@eventReject');
+                    
+                    /** Show event request details */
+                    Route::get('/requests/{requestId}/overview', 'EventsController@requestOverview');
+                });
                 
-                /** Get upcoming events list */
+                /** Get upcoming (future) events list */
                 Route::get('/upcoming', 'EventsController@upcomingEvents');
-                
-                /** Accept event request */
-                Route::post('/requests/{requestId}/accept', 'EventsController@eventAccept');
-                
-                /** Decline event request */
-                Route::post('/requests/{requestId}/reject', 'EventsController@eventReject');
-                
-                /** Show event request details */
-                Route::get('/requests/{requestId}/overview', 'EventsController@requestOverview');
             });
             Route::get('/check/restricted', 'CheckController@restricted');
             Route::get('/faq', 'FAQController@index');

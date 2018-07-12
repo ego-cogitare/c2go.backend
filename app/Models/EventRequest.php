@@ -34,6 +34,14 @@ class EventRequest extends Model
     /**
      * Author of the request
      */
+    public function requestor() 
+    {
+        return $this->belongsTo('App\Models\User', 'requestor_user_id');
+    }
+    
+    /**
+     * Author of the request
+     */
     public function proposal() 
     {
         return $this->hasOne('App\Models\EventProposal', 'id', 'event_proposals_id');
