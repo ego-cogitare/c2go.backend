@@ -2,18 +2,23 @@
 
 namespace App\Models;
 
+
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Hash;
-use App\Models\UserSetting;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-use Exception;
 
+/**
+ * Class User
+ * @package App\Models
+ */
 class User extends Authenticatable
 {
     use SoftDeletes;
-    
+
+    /**
+     * @var array
+     */
     protected $appends = [
         'age', 
         'rank',
@@ -22,7 +27,6 @@ class User extends Authenticatable
 
     /**
      * The attributes that are mass assignable.
-     *
      * @var array
      */
     protected $fillable = [
@@ -36,52 +40,81 @@ class User extends Authenticatable
         'is_subscribed',
         'android_device_token',
         'ios_device_token',
+        'is_blocked'
     ];
 
     /**
      * The attributes that should be hidden for arrays.
-     *
      * @var array
      */
     protected $hidden = [
         'password', 
         'remember_token',
     ];
-    
+
+
+    /**
+     * @return int
+     */
     public function getAgeAttribute() 
     {
         return Carbon::parse($this->attributes['birth_date'])->age;
     }
-    
+
+
+    /**
+     * @return int
+     */
     public function getRankAttribute() 
     {
         return rand(1, 5);
     }
 
-    public function setPasswordAttribute($value)
+
+    /**
+     * @param string $value
+     */
+    public function setPasswordAttribute(string $value)
     {
         $this->attributes['password'] = Hash::make($value);
     }
-    
+
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function prices()
     {
         return $this->hasMany('App\Models\EventProposal');
     }
-    
+
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function reviews() 
     {
         return $this->hasMany('App\Models\UserReview', 'user_about_id');
     }
-    
+
+
+    /**
+     * @return string
+     */
     public function getFullName() 
     {
         return $this->first_name . ' ' . $this->last_name;
     }
-    
+
+
+    /**
+     * @param string $value
+     */
     public function setBirthDateAttribute($value)
     {
         $this->attributes['birth_date'] = Carbon::createFromFormat('d.m.Y', $value)->format('Y-m-d');
     }
+
     
     /**
      * Get user settings
@@ -92,7 +125,8 @@ class User extends Authenticatable
             ->get()
             ->pluck('value', 'section');
     }
-    
+
+
     /**
      * Get additional model "settings" field
      * @return array
@@ -144,6 +178,7 @@ class User extends Authenticatable
         
         return $settings;
     }
+
     
     /**
      * Get user phone
@@ -164,7 +199,8 @@ class User extends Authenticatable
         
         return $phone->value;
     }
-    
+
+
     /**
      * Does user has the phone number
      * @param string $phone
@@ -182,6 +218,7 @@ class User extends Authenticatable
         
         return false;
     }
+
     
     /**
      * Add phone number
@@ -204,6 +241,7 @@ class User extends Authenticatable
         
         return true;
     }
+
     
     /**
      * Get current logged in user account type

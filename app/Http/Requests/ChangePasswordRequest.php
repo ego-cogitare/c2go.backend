@@ -2,10 +2,14 @@
 
 namespace App\Http\Requests;
 
-use App\Http\Requests\Request;
-use Illuminate\Support\Facades\Auth;
 
-class CategorySaveRequest extends Request
+use App\Http\Requests\Request;
+
+/**
+ * Class ChangePasswordRequest
+ * @package App\Http\Requests
+ */
+class ChangePasswordRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,10 +29,9 @@ class CategorySaveRequest extends Request
     public function rules()
     {
         return [
-            'name' => 'required',
-            'color' => 'required|string',
-            'cover_photo' => 'nullable|image',
-            'parent_id' => 'nullable|integer|min:1|exists:categories,id'
+            'old_password' => 'required',
+            'new_password' => 'required|min:6',
+            'new_password_confirm' => 'required|same:new_password'
         ];
     }
 }

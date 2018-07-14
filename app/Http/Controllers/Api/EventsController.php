@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
@@ -12,19 +13,22 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\AutocompleteRequest;
-use App\Interfaces\IAccountType;
 use App\Interfaces\IEventStates;
 use DB;
 
+/**
+ * Class EventsController
+ * @package App\Http\Controllers\Api
+ */
 class EventsController extends Controller
 {
     const RIDE_CATEGORY_IDS = [4];
     const DEFAULT_CATEGORY_ITEMS_LIMIT = 10;
     const TOP_CATEGORY_ITEMS_LIMIT = 3;
-    
+
+
     /**
      * Display a listing of the resource.
-     *
      * @return \Illuminate\View\View
      */
     public function index(Request $request)
@@ -121,7 +125,12 @@ class EventsController extends Controller
             'data' => $result
         ]);
     }
-    
+
+
+    /**
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function proposals($id) 
     {
         $event = Event::with([
@@ -142,7 +151,13 @@ class EventsController extends Controller
             'data' => $event
         ]);
     }
-    
+
+
+    /**
+     * @param Request $request
+     * @param $proposal
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function details(Request $request, $proposal)
     {
         $limit = $request->get('limit', 5);
@@ -176,7 +191,12 @@ class EventsController extends Controller
             'data' => $event
         ]);
     }
-    
+
+
+    /**
+     * @param $proposal
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function general($proposal)
     {
         $event = EventProposal::with([
@@ -201,6 +221,7 @@ class EventsController extends Controller
             'data' => $event
         ]);
     }
+
     
     /**
      * Send event request to disabled user
@@ -236,9 +257,11 @@ class EventsController extends Controller
             'data' => $event_request
         ]);
     }
+
     
     /**
      * Get current logged in user events requests
+     * @return string
      */
     public function showUserRequests() 
     {
@@ -268,6 +291,7 @@ class EventsController extends Controller
             'data' => $events
         ]);
     }
+
     
     /**
      * Return upcoming events list for disabled user
@@ -301,6 +325,7 @@ class EventsController extends Controller
             'data' => $events
         ]);
     }
+
     
     /**
      * Event information on event accept page
@@ -327,7 +352,8 @@ class EventsController extends Controller
         
         return response()->json(['success' => true, 'data' => $data]);
     }
-    
+
+
     /**
      * Event searching for autocomplete (during event adding)
      * @param AutocompleteRequest $request
@@ -352,7 +378,8 @@ class EventsController extends Controller
         
         return response()->json(['success' => true, 'data' => $events]);
     }
-    
+
+
     /**
      * Set event request state to accepted
      * @param int $requestId Event request id
@@ -399,7 +426,8 @@ class EventsController extends Controller
             'success' => true
         ]);
     }
-    
+
+
     /**
      * Set event request state to declined
      * @param int $requestId Event request id

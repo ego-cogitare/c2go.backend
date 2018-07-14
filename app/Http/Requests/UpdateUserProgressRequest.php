@@ -2,8 +2,13 @@
 
 namespace App\Http\Requests;
 
+
 use App\Http\Requests\Request;
 
+/**
+ * Class UpdateUserProgressRequest
+ * @package App\Http\Requests
+ */
 class UpdateUserProgressRequest extends Request
 {
     /**

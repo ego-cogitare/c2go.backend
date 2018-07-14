@@ -28,6 +28,7 @@ Route::group(['namespace' => 'Api'], function () {
         Route::get('/general/{proposal}', 'EventsController@general');
         Route::get('/autocomplete', 'EventsController@autocomplete');
     });
+
     Route::group(['prefix' => 'auth'], function() {
         Route::post('/login', 'AuthController@login')->name('auth_login');
         Route::get('/refresh-token', 'AuthController@refreshToken');
@@ -55,6 +56,8 @@ Route::group(['namespace' => 'Api'], function () {
             Route::post('/progress/{progress}', 'UserController@updateProgress');
             Route::post('/profile-photo', 'UserController@profilePhoto');
             Route::get('/{user}/info', 'UserController@profileInfo');
+            Route::post('/deactivate', 'UserController@deactivate');
+            Route::post('/change-password', 'UserController@changePassword');
         });
         Route::group(['middleware' => CheckRegCompleteness::class], function() {
             Route::group(['prefix' => 'events'], function() {
@@ -88,9 +91,6 @@ Route::group(['namespace' => 'Api'], function () {
                 /** Get upcoming (future) events list */
                 Route::get('/upcoming', 'EventsController@upcomingEvents');
             });
-            Route::get('/check/restricted', 'CheckController@restricted');
-            Route::get('/faq', 'FAQController@index');
-            Route::post('/testimonial', 'TestimonialController@store');
         });
     });
 });
