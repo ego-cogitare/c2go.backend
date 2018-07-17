@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 
+use App\Exceptions\WrongSettingsException;
 use App\Models\User;
 use App\Models\UserSetting;
 use App\Models\UserConnection;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use App\Interfaces\IUserSettings;
 
 /**
  * Class UserController
@@ -20,7 +21,7 @@ class UserController extends Controller
 {
     /**
      * Deactivate user account
-     * @return Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function deactivate()
     {
@@ -36,65 +37,59 @@ class UserController extends Controller
     /**
      * @param Requests\UpdateUserProgressRequest $request
      * @param $progress
-     * @return Response
+     * @return \Illuminate\Http\JsonResponse
+     * @throws WrongSettingsException
      */
     public function updateProgress(Requests\UpdateUserProgressRequest $request, $progress)
     {
-        Auth::user()->update(['progress' => $progress]);
-
         $data = $request->only(['section', 'value']);
+
+        Auth::user()->update([
+            'progress' => $progress
+        ]);
         
         // Save settings
         if (!empty($data['section'])) {
-            UserSetting::apply(Auth::user()->id, $data['section'], $data['value']);
+            UserSetting::apply($data['section'], $data['value']);
         }
         
-        return new Response(['user' => Auth::user()]);
+        return response()->json([
+            'success' => true,
+            'user' => Auth::user(),
+        ]);
     }
 
 
     /**
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws WrongSettingsException
      */
     public function profilePhoto(Request $request) 
     {
+        /** @var string $path */
         $path = $request->file('profile-photo')->store('profile-photos');
         
-        // Update user profile photo
-        UserSetting::apply(Auth::user()->id, 'profile_photo', $path);
+        /** Update user profile photo */
+        UserSetting::apply(IUserSettings::PROFILE_PHOTO, $path);
         
         return response()->json([
             'status' => true,
             'user' => User::find(Auth::user()->id)
         ]);
     }
+
     
     /**
      * Get user information
-     * @param Request $request
-     * @param type $user
-     * @return void
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function profileInfo(Request $request, $user) 
+    public function currentUser()
     {
-        $data = User::find($user);
-        
-        if (!$data) {
-            $result = [
-                'status' => false,
-                'error' => 'User not found'
-            ];
-            $code = 404;
-        } else {
-            $result = [
-                'status' => true,
-                'data' => $data
-            ];
-            $code = 200;
-        }
-        
-        return new Response($result, $code);
+        return response()->json([
+            'status' => true,
+            'data' => Auth::user()
+        ]);
     }
 
 
@@ -118,6 +113,52 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Password changed'
+        ]);
+    }
+
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws WrongSettingsException
+     */
+    public function updateDisabilityInfo(Request $request)
+    {
+        $request->validate([
+            'disability_information' => 'required|string|min:10'
+        ]);
+
+        UserSetting::apply(
+            IUserSettings::PROFILE_DISABILITY_INFORMATION,
+            $request->input('disability_information')
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Information updated',
+        ]);
+    }
+
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws WrongSettingsException
+     */
+    public function updateRequiredAssistance(Request $request)
+    {
+        $request->validate([
+            'required_assistance' => 'required|string|min:10'
+        ]);
+
+        UserSetting::apply(
+            IUserSettings::PROFILE_REQUIRED_ASSISTANCE,
+            $request->input('required_assistance')
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Information updated',
         ]);
     }
 }

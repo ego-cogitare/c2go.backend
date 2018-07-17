@@ -53,11 +53,13 @@ Route::group(['namespace' => 'Api'], function () {
      */
     Route::group(['middleware' => ['jwt.auth']], function() {
         Route::group(['prefix' => 'user'], function() {
+            Route::get('/info', 'UserController@currentUser');
             Route::post('/progress/{progress}', 'UserController@updateProgress');
             Route::post('/profile-photo', 'UserController@profilePhoto');
-            Route::get('/{user}/info', 'UserController@profileInfo');
             Route::post('/deactivate', 'UserController@deactivate');
             Route::post('/change-password', 'UserController@changePassword');
+            Route::post('/disability-information', 'UserController@updateDisabilityInfo');
+            Route::post('/required-assistance', 'UserController@updateRequiredAssistance');
         });
         Route::group(['middleware' => CheckRegCompleteness::class], function() {
             Route::group(['prefix' => 'events'], function() {

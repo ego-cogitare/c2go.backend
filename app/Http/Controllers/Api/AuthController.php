@@ -124,8 +124,8 @@ class AuthController extends Controller
         $token = JWTAuth::fromUser($user);
         $user = User::find($user->id);
         
-        // Save user location to user settings table
-        UserSetting::location($user->id, $data['location']);
+        /** Save user location to user settings table */
+        UserSetting::location($data['location'], $user->id);
         
         //event(new NotificationEvent($user, 'Add your first broker', ['type' => 'first broker']));
         return response()->json(compact('token', 'user'));

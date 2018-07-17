@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
+use App\Classes\UserSettingsBase as UserSettings;
 
 /**
  * Class User
@@ -135,7 +136,7 @@ class User extends Authenticatable
     {
         /** @var array $settings */
         $settings = $this->getUserSettings();
-        
+
         foreach ($settings as $section => $value) {
             switch ($section) {
                 case 'location':
@@ -148,8 +149,7 @@ class User extends Authenticatable
             
                 case 'profile_interests':
                     $data = json_decode($value);
-                    $categories = [];
-                    
+
                     if (!empty($data->categories)) {
                         $settings[$section] = Category::with([
                                 'categories' => function($query) use ($data) {
@@ -171,9 +171,10 @@ class User extends Authenticatable
         }
         
         /** Mock with required fields */
-        $settings = array_merge([
-                'profile_interests' => []
-            ], $settings->toArray()
+        $settings = array_merge(
+            UserSettings::settingSections(),
+            ['profile_interests' => []],
+            $settings->toArray()
         );
         
         return $settings;
