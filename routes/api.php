@@ -59,7 +59,7 @@ Route::group(['namespace' => 'Api'], function () {
             Route::post('/deactivate', 'UserController@deactivate');
             Route::post('/change-password', 'UserController@changePassword');
             Route::post('/disability-information', 'UserController@updateDisabilityInfo');
-            Route::post('/required-assistance', 'UserController@updateRequiredAssistance');
+            Route::post('/require-assistance', 'UserController@updateRequireAssistance');
         });
         Route::group(['middleware' => CheckRegCompleteness::class], function() {
             Route::group(['prefix' => 'events'], function() {

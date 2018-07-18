@@ -31,7 +31,7 @@ interface IUserSettings
     const PROFILE_DISABILITY_INFORMATION = 'disability_information';
 
     /** @var string */
-    const PROFILE_REQUIRED_ASSISTANCE = 'required_assistance';
+    const PROFILE_REQUIRE_ASSISTANCE = 'require_assistance';
 }
 
 

@@ -145,15 +145,15 @@ class UserController extends Controller
      * @return \Illuminate\Http\JsonResponse
      * @throws WrongSettingsException
      */
-    public function updateRequiredAssistance(Request $request)
+    public function updateRequireAssistance(Request $request)
     {
         $request->validate([
-            'required_assistance' => 'required|string|min:10'
+            'require_assistance' => 'required|string|min:10'
         ]);
 
         UserSetting::apply(
-            IUserSettings::PROFILE_REQUIRED_ASSISTANCE,
-            $request->input('required_assistance')
+            IUserSettings::PROFILE_REQUIRE_ASSISTANCE,
+            $request->input('require_assistance')
         );
 
         return response()->json([
