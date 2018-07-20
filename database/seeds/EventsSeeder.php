@@ -243,11 +243,10 @@ class EventsSeeder extends Seeder
                     'category_id' => $categories[array_rand($categories)],
                     'user_id' => $user_id, 
                     'name' => self::NAMES[array_rand(self::NAMES)], 
-                    'description' => self::PHRASES[array_rand(self::PHRASES)],
-                    'event_location_human' => self::CITIES[array_rand(self::CITIES)],
-                    'event_location_latlng' => '{}',
-                    'event_destination_human' => self::CITIES[array_rand(self::CITIES)],
-                    'event_destination_latlng' => '{}',
+                    'destination' => self::CITIES[array_rand(self::CITIES)],
+                    'destination_latlng' => '{}',
+                    'dispatch' => self::CITIES[array_rand(self::CITIES)],
+                    'dispatch_latlng' => '{}',
                     'date' => date('Y-m-d H:i:s', time() + rand(36, 1200) * 3600),
                     'is_top' => rand(1, 30) === 30,
                     'is_active' => 1
@@ -268,36 +267,22 @@ class EventsSeeder extends Seeder
             }
             
             if ($iteration < self::MAX_ITERATIONS) {
-                EventProposal::create([
+                $event_proposal = EventProposal::create([
                     'event_id' => $event->id,
                     'user_id' => $user_id,
+                    'tickets_bought' => rand(0, 1),
                     'price' => rand(1, 1000),
+                    'message' => self::PHRASES[array_rand(self::PHRASES)],
+                    'description' => self::PHRASES[array_rand(self::PHRASES)],
+                    'url' => 'http://' . crc32(rand(0, 10000)) . '.com/event-about/' . rand(100, 10000)
                 ]);
-            }
-            
-            // Create event requests
-            for ($j = 0; $j < rand(0, 30); $j++) {
-                
-                // Get random user who make request
-                $user_id = $users[array_rand($users)];
-                
-                $iteration = 0;
-                while (EventRequest::where(['event_id' => $event->id, 'user_id' => $user_id, 'event_user_id' => $event->user_id])->first()) {
-                    $user_id = $users[array_rand($users)];
-                    $iteration++;
-                    if ($iteration === self::MAX_ITERATIONS) {
-                        break;
-                    }
-                }
-                if ($iteration < self::MAX_ITERATIONS) {
-                    EventRequest::create([
-                        'event_user_id' => $event->user_id,
-                        'user_id' => $user_id,
-                        'event_id' => $event->id,
-                        'message' => self::PHRASES[array_rand(self::PHRASES)],
-                        'is_active' => 1,
-                    ]);
-                }
+
+                // Create event request for the proposal
+                EventRequest::create([
+                    'event_proposals_id' => $event_proposal->id,
+                    'user_id' => $users[array_rand($users)],
+                    'message' => self::PHRASES[array_rand(self::PHRASES)],
+                ]);
             }
         }
     }

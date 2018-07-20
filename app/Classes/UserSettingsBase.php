@@ -38,6 +38,7 @@ abstract class UserSettingsBase implements IUserSettings
     /**
      * @param string $section
      * @return bool
+     * @throws \ReflectionException
      */
     public static function isSectionValid(string $section): bool
     {

@@ -131,6 +131,7 @@ class User extends Authenticatable
     /**
      * Get additional model "settings" field
      * @return array
+     * @throws \ReflectionException
      */
     public function getSettingsAttribute() 
     {
