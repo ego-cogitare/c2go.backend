@@ -54,6 +54,7 @@ Route::group(['namespace' => 'Api'], function () {
     Route::group(['middleware' => ['jwt.auth']], function() {
         Route::group(['prefix' => 'user'], function() {
             Route::get('/info', 'UserController@currentUser');
+            Route::get('/{user}/info', 'UserController@profileInfo');
             Route::post('/progress/{progress}', 'UserController@updateProgress');
             Route::post('/profile-photo', 'UserController@profilePhoto');
             Route::post('/deactivate', 'UserController@deactivate');

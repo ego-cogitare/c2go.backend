@@ -94,6 +94,30 @@ class UserController extends Controller
 
 
     /**
+     * @param Requests\ProfileInfoRequest $request
+     * @param $user
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function profileInfo($user)
+    {
+        /** @var User $profile */
+        $profile = User::find($user);
+
+        if ($profile === null) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Profile not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => $profile
+        ]);
+    }
+
+
+    /**
      * @param Requests\ChangePasswordRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
