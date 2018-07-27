@@ -2,6 +2,11 @@
 
 namespace App\Interfaces;
 
+
+/**
+ * Interface IEventStates
+ * @package App\Interfaces
+ */
 interface IEventStates
 {
     const STATE_NEW = 1;

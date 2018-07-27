@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Interfaces\IAccountType;
+use App\Interfaces\IState;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\EventRequest;
@@ -14,6 +16,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\AutocompleteRequest;
 use App\Interfaces\IEventStates;
+use Event as EventDispatcher;
 use DB;
 
 /**
@@ -135,7 +138,10 @@ class EventsController extends Controller
     {
         $event = Event::with([
             'proposals' => function($query) use($id) {
-                $query->with(['user'])->orderBy('price', 'ASC');
+                $query
+                    ->with(['user'])
+                    ->where('is_active', IState::ACTIVE)
+                    ->orderBy('price', 'ASC');
             }, 
             'user',
             'category', 
@@ -278,14 +284,18 @@ class EventsController extends Controller
         ->leftJoin('event_proposals', 'event_proposals.id', '=', 'event_requests.event_proposals_id')
         ->leftJoin('events', 'events.id', '=', 'event_proposals.event_id')
         ->where('event_requests.is_active', 1)
-        ->whereIn('state', [IEventStates::STATE_NEW, IEventStates::STATE_REJECTED])
+        //->whereIn('state', [IEventStates::STATE_NEW, IEventStates::STATE_REJECTED])
         ->where(function($query) {
-            $query->orWhere('event_proposals.user_id', Auth::user()->id);
-            $query->orWhere('event_requests.user_id', Auth::user()->id);
+            if (Auth::user()->getAccountType() === IAccountType::DISABLED) {
+                $query->orWhere('event_proposals.user_id', Auth::user()->id);
+            } else {
+                $query->orWhere('event_requests.user_id', Auth::user()->id);
+            }
         })
+        ->where('date', '>', date('Y-m-d H:i:s'))
         ->orderBy('events.date', 'asc')
         ->get();
-                
+
         return response()->json([
             'success' => true,
             'data' => $events
@@ -312,8 +322,11 @@ class EventsController extends Controller
         ->leftJoin('events', 'events.id', '=', 'event_proposals.event_id')
         ->where('event_requests.is_active', 1)
         ->where(function($query) {
-            $query->orWhere('event_proposals.user_id', Auth::user()->id);
-            $query->orWhere('event_requests.user_id', Auth::user()->id);
+            if (Auth::user()->getAccountType() === IAccountType::DISABLED) {
+                $query->orWhere('event_proposals.user_id', Auth::user()->id);
+            } else {
+                $query->orWhere('event_requests.user_id', Auth::user()->id);
+            }
         })
         ->where('state', IEventStates::STATE_ACCEPTED)
         ->where('date', '>', date('Y-m-d H:i:s'))
@@ -383,6 +396,7 @@ class EventsController extends Controller
     /**
      * Set event request state to accepted
      * @param int $requestId Event request id
+     * @throws \Exception
      * @return string
      */
     public function eventAccept($requestId)
@@ -410,17 +424,17 @@ class EventsController extends Controller
                 'message' => 'Event does not have any proposals'
             ], 404);
         }
-        
+
+        /** If user tries to approve request on proposal which was created by another user */
         if ($eventRequest->proposal->user->id !== Auth::user()->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'You have no permissions to accept this event'
             ], 409);
         }
-        
-        $eventRequest->update([
-            'state' => IEventStates::STATE_ACCEPTED
-        ]);
+
+        /** Broadcast event */
+        EventDispatcher::fire('event.accept', $eventRequest);
         
         return response()->json([
             'success' => true
@@ -448,10 +462,9 @@ class EventsController extends Controller
                 'message' => 'Event request not found'
             ], 404);
         }
-        
-        $eventRequest->update([
-            'state' => IEventStates::STATE_REJECTED
-        ]);
+
+        /** Broadcast event */
+        EventDispatcher::fire('event.reject', $eventRequest);
         
         return response()->json([
             'success' => true

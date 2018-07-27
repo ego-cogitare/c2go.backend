@@ -23,6 +23,7 @@ class CreateEventProposalsTable extends Migration
             $table->string('message', 1024);
             $table->string('description', 1024);
             $table->string('url', 64);
+            $table->unsignedTinyInteger('is_active')->default(1);
             $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unique(['event_id', 'user_id']);

@@ -2,6 +2,11 @@
 
 namespace App\Interfaces;
 
+
+/**
+ * Interface IAccountType
+ * @package App\Interfaces
+ */
 interface IAccountType
 {
     /** Disabled human account type */
