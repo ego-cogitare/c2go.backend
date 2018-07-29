@@ -180,7 +180,7 @@ class EventsController extends Controller
             'user' => function($query) use($limit, $offset) {
                 $query->with([
                     'reviews' => function($query) use($limit, $offset) {
-                        $query->with(['user'])->limit($limit)->offset($offset);
+                        $query->with(['reviewer'])->limit($limit)->offset($offset);
                     }
                 ]);
             },
@@ -332,7 +332,61 @@ class EventsController extends Controller
         ->where('date', '>', date('Y-m-d H:i:s'))
         ->orderBy('events.date', 'asc')
         ->get();
-                
+
+        return response()->json([
+            'success' => true,
+            'data' => $events
+        ]);
+    }
+
+
+    /**
+     * Return upcoming events list for disabled user
+     * @param Request $request
+     * @return string
+     */
+    public function visitedEvents(Request $request)
+    {
+        $events = EventRequest::with([
+                'requestor' => function($query) {
+                    $query->with(['reviews' => function($query) {
+                        $query
+                            ->where('user_id', Auth::user()->id)
+                            ->where('is_active', IState::ACTIVE)
+                            ->orderBy('id', 'DESC');
+                    }]);
+                },
+                'proposal' => function($query) {
+                    $query->with(['user' => function($query) {
+                        $query->with(['reviews' => function($query) {
+                            $query
+                                ->where('user_id', Auth::user()->id)
+                                ->where('is_active', IState::ACTIVE)
+                                ->orderBy('id', 'DESC');
+                        }]);
+                    }]);
+                }]
+            )
+            ->select(
+                '*',
+                'event_requests.user_id AS requestor_user_id',
+                \DB::raw('DATE_FORMAT(events.date, \'%d.%m.%Y\') AS date')
+            )
+            ->leftJoin('event_proposals', 'event_proposals.id', '=', 'event_requests.event_proposals_id')
+            ->leftJoin('events', 'events.id', '=', 'event_proposals.event_id')
+            ->where('event_requests.is_active', IState::ACTIVE)
+            ->where(function($query) {
+                if (Auth::user()->getAccountType() === IAccountType::DISABLED) {
+                    $query->orWhere('event_proposals.user_id', Auth::user()->id);
+                } else {
+                    $query->orWhere('event_requests.user_id', Auth::user()->id);
+                }
+            })
+            ->where('state', IEventStates::STATE_ACCEPTED)
+            ->where('date', '<', date('Y-m-d H:i:s'))
+            ->orderBy('events.date', 'asc')
+            ->get();
+
         return response()->json([
             'success' => true,
             'data' => $events

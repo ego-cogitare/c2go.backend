@@ -91,6 +91,7 @@ class User extends Authenticatable
 
 
     /**
+     * List of received reviews from another users
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function reviews() 

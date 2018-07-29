@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 
 use App\Exceptions\WrongSettingsException;
+use App\Interfaces\IState;
 use App\Models\User;
 use App\Models\UserSetting;
 use App\Models\UserConnection;
@@ -94,14 +95,20 @@ class UserController extends Controller
 
 
     /**
-     * @param Requests\ProfileInfoRequest $request
-     * @param $user
+     * @param int $user
      * @return \Illuminate\Http\JsonResponse
      */
-    public function profileInfo($user)
+    public function profileInfo(int $user)
     {
         /** @var User $profile */
-        $profile = User::find($user);
+        $profile = User::with(['reviews' => function($query) {
+            $query
+                ->with(['reviewer'])
+                ->where('is_active', IState::ACTIVE)
+                ->orderBy('id', 'DESC')
+                ->limit(5);
+        }])
+        ->find($user);
 
         if ($profile === null) {
             return response()->json([

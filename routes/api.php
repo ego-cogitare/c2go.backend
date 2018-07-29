@@ -71,6 +71,9 @@ Route::group(['namespace' => 'Api'], function () {
                 Route::group(['middleware' => NormalUsersFilter::class], function() {
                     Route::post('/requests/{proposal}', 'EventsController@storeRequest');
                 });
+
+                /** Get current logged in user event requests */
+                Route::get('/visited', 'EventsController@visitedEvents');
                 
                 /** Add new event */
                 Route::group(['middleware' => DisabledUsersFilter::class], function() {
