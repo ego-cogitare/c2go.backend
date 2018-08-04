@@ -6,7 +6,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Event;
 use \App\Listeners\ {
-    EventAccept, EventReject
+    EventAccept, EventReject, VoteLived
 };
 
 /**
@@ -23,5 +23,6 @@ class EventServiceProvider extends ServiceProvider
     {
         Event::listen('event.accept', EventAccept::class);
         Event::listen('event.reject', EventReject::class);
+        Event::listen('vote.lived', VoteLived::class);
     }
 }

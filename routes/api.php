@@ -61,6 +61,9 @@ Route::group(['namespace' => 'Api'], function () {
             Route::post('/change-password', 'UserController@changePassword');
             Route::post('/disability-information', 'UserController@updateDisabilityInfo');
             Route::post('/require-assistance', 'UserController@updateRequireAssistance');
+
+            /** Live vote after event */
+            Route::post('/vote/{requestId}', 'UserController@storeVote');
         });
         Route::group(['middleware' => CheckRegCompleteness::class], function() {
             Route::group(['prefix' => 'events'], function() {

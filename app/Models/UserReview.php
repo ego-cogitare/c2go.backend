@@ -18,11 +18,11 @@ class UserReview extends Model
     protected $fillable = [
         'user_about_id',
         'user_id',
+        'event_id',
         'mark',
         'message',
         'is_active',
     ];
-
 
     /**
      * Get user which review was written about
@@ -41,5 +41,15 @@ class UserReview extends Model
     public function reviewer()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id');
+    }
+
+
+    /**
+     * Get event of review
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function event()
+    {
+        return $this->belongsTo('App\Models\Event', 'event_id', 'id');
     }
 }

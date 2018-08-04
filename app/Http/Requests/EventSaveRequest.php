@@ -2,8 +2,13 @@
 
 namespace App\Http\Requests;
 
+
 use App\Http\Requests\Request;
 
+/**
+ * Class EventSaveRequest
+ * @package App\Http\Requests
+ */
 class EventSaveRequest extends Request
 {
     /**

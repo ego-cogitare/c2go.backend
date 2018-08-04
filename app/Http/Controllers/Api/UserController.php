@@ -4,15 +4,20 @@ namespace App\Http\Controllers\Api;
 
 
 use App\Exceptions\WrongSettingsException;
+use App\Interfaces\IAccountType;
 use App\Interfaces\IState;
 use App\Models\User;
 use App\Models\UserSetting;
 use App\Models\UserConnection;
+use App\Models\EventRequest;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Interfaces\IUserSettings;
+use App\Models\UserReview;
+use Illuminate\Support\Facades\Gate;
+use Event as EventDispatcher;
 
 /**
  * Class UserController
@@ -191,5 +196,59 @@ class UserController extends Controller
             'success' => true,
             'message' => 'Information updated',
         ]);
+    }
+
+
+    /**
+     * @param Requests\VoteRequest $request
+     * @param $requestId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function storeVote(Requests\VoteRequest $request, $requestId)
+    {
+        /** @var EventRequest|null $eventRequest */
+        $eventRequest = EventRequest::with(['proposal'])
+            ->where('id', $requestId)
+            ->where('is_active', IState::ACTIVE)
+            ->first();
+
+        if ($eventRequest === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Request not found'
+            ], 404);
+        }
+
+        /**
+         * Check if user has anought right to vote on this event request
+         * @var array|bool $reviewGate
+         */
+        if (Gate::allows('vote:write', $eventRequest)) {
+            /** @var int $userAboutId */
+            $userAboutId = Auth::user()->getAccountType() === IAccountType::NORMAL
+                ? $eventRequest->proposal->user_id
+                : $eventRequest->user_id;
+
+            /** @var UserReview $userReview */
+            $userReview = UserReview::create([
+                'mark' => $request->input('mark'),
+                'user_about_id' => $userAboutId,
+                'user_id' => Auth::user()->id,
+                'event_id' => $eventRequest->proposal->event->id,
+            ]);
+
+            /** Broadcast vote received event (to send notifications) */
+            EventDispatcher::fire('vote.lived', $userReview);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Your vote saved'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'You have no right to live vote for this user and event'
+        ], 403);
     }
 }

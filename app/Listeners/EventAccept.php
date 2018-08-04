@@ -46,7 +46,8 @@ class EventAccept
 
         /** Mark event request as accepted */
         $eventRequest->update([
-            'state' => IEventStates::STATE_ACCEPTED
+            'state' => IEventStates::STATE_ACCEPTED,
+            'is_active' => IState::INACTIVE,
         ]);
 
         /** Mark all requests for the same event as "Rejected" */

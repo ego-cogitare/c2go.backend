@@ -4,6 +4,10 @@ namespace App\Http\Requests;
 
 use App\Http\Requests\Request;
 
+/**
+ * Class AutocompleteRequest
+ * @package App\Http\Requests
+ */
 class AutocompleteRequest extends Request
 {
     /**

@@ -2,20 +2,21 @@
 
 namespace App\Policies;
 
-use App\Models\Testimonial;
-use App\Models\User;
 
-class TestimonialPolicy
+/**
+ * Class VotePolicy
+ * @package App\Policies
+ */
+class VotePolicy
 {
     /**
      * Create a new policy instance.
-     *
      * @return void
      */
     public function __construct()
     {
-        //
     }
+
 
     /**
      * @param Testimonial $testimonial
