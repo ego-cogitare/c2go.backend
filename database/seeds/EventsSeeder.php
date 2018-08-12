@@ -7,6 +7,9 @@ use App\Models\EventRequest;
 use App\Models\Category;
 use App\Models\User;
 
+/**
+ * Class EventsSeeder
+ */
 class EventsSeeder extends Seeder
 {
     const NAMES = [
@@ -212,11 +215,11 @@ class EventsSeeder extends Seeder
     ];
     
     const MAX_ITERATIONS = 10;
-    
+
     /**
      * Run the database seeds.
-     *
      * @return void
+     * @throws Exception
      */
     public function run()
     {

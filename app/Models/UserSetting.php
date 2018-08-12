@@ -40,6 +40,7 @@ class UserSetting extends Model
      * @param string $value
      * @return mixed
      * @throws WrongSettingsException
+     * @throws \ReflectionException
      */
     public static function apply($section, $value, $user_id = null)
     {

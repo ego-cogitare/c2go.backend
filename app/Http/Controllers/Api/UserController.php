@@ -45,6 +45,7 @@ class UserController extends Controller
      * @param $progress
      * @return \Illuminate\Http\JsonResponse
      * @throws WrongSettingsException
+     * @throws \ReflectionException
      */
     public function updateProgress(Requests\UpdateUserProgressRequest $request, $progress)
     {
@@ -70,6 +71,7 @@ class UserController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      * @throws WrongSettingsException
+     * @throws \ReflectionException
      */
     public function profilePhoto(Request $request) 
     {
@@ -157,6 +159,7 @@ class UserController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      * @throws WrongSettingsException
+     * @throws \ReflectionException
      */
     public function updateDisabilityInfo(Request $request)
     {
@@ -180,6 +183,7 @@ class UserController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      * @throws WrongSettingsException
+     * @throws \ReflectionException
      */
     public function updateRequireAssistance(Request $request)
     {
@@ -190,6 +194,26 @@ class UserController extends Controller
         UserSetting::apply(
             IUserSettings::PROFILE_REQUIRE_ASSISTANCE,
             $request->input('require_assistance')
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Information updated',
+        ]);
+    }
+
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws WrongSettingsException
+     * @throws \ReflectionException
+     */
+    public function updateSettingSection(Request $request)
+    {
+        UserSetting::apply(
+            $request->input('section'),
+            $request->input('value')
         );
 
         return response()->json([

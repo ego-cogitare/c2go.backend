@@ -3,8 +3,11 @@
 use Illuminate\Database\Seeder;
 use App\Models\UserSetting;
 use App\Interfaces\IUserSettings;
-use \App\Models\User;
+use App\Models\User;
 
+/**
+ * Class UsersTableSeeder
+ */
 class UsersTableSeeder extends Seeder
 {
     const NAMES = [

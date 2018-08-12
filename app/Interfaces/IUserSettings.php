@@ -32,6 +32,24 @@ interface IUserSettings
 
     /** @var string */
     const PROFILE_REQUIRE_ASSISTANCE = 'require_assistance';
+
+    /** @var string */
+    const NOTIFY_PARTICIPANTS_EMAIL = 'notify_participants_email';
+
+    /** @var string */
+    const NOTIFY_PARTICIPANTS_SMS = 'notify_participants_sms';
+
+    /** @var string */
+    const NOTIFY_PARTICIPANTS_PUSH = 'notify_participants_push';
+
+    /** @var string */
+    const NOTIFY_PLATFORM_EMAIL = 'notify_platform_email';
+
+    /** @var string */
+    const NOTIFY_REMINDER_EMAIL = 'notify_reminder_email';
+
+    /** @var string */
+    const NOTIFY_REMINDER_SMS = 'notify_reminder_sms';
 }
 
 
