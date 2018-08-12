@@ -23,6 +23,10 @@ use DB;
  */
 class EventAccept
 {
+    /**
+     * @param EventRequest $eventRequest
+     * @throws \Exception
+     */
     public function handle(EventRequest $eventRequest)
     {
         if (Auth::user()->getAccountType() !== IAccountType::DISABLED) {
@@ -47,7 +51,6 @@ class EventAccept
         /** Mark event request as accepted */
         $eventRequest->update([
             'state' => IEventStates::STATE_ACCEPTED,
-            'is_active' => IState::INACTIVE,
         ]);
 
         /** Mark all requests for the same event as "Rejected" */

@@ -283,8 +283,8 @@ class EventsController extends Controller
         )
         ->leftJoin('event_proposals', 'event_proposals.id', '=', 'event_requests.event_proposals_id')
         ->leftJoin('events', 'events.id', '=', 'event_proposals.event_id')
-        ->where('event_requests.is_active', 1)
-        //->whereIn('state', [IEventStates::STATE_NEW, IEventStates::STATE_REJECTED])
+        ->where('event_requests.is_active', IState::ACTIVE)
+        ->whereIn('state', [IEventStates::STATE_NEW, IEventStates::STATE_ACCEPTED, IEventStates::STATE_REJECTED])
         ->where(function($query) {
             if (Auth::user()->getAccountType() === IAccountType::DISABLED) {
                 $query->orWhere('event_proposals.user_id', Auth::user()->id);
@@ -320,7 +320,8 @@ class EventsController extends Controller
         )
         ->leftJoin('event_proposals', 'event_proposals.id', '=', 'event_requests.event_proposals_id')
         ->leftJoin('events', 'events.id', '=', 'event_proposals.event_id')
-        ->where('event_requests.is_active', 1)
+        ->where('event_requests.is_active', IState::ACTIVE)
+        ->where('state', IEventStates::STATE_ACCEPTED)
         ->where(function($query) {
             if (Auth::user()->getAccountType() === IAccountType::DISABLED) {
                 $query->orWhere('event_proposals.user_id', Auth::user()->id);
@@ -328,7 +329,6 @@ class EventsController extends Controller
                 $query->orWhere('event_requests.user_id', Auth::user()->id);
             }
         })
-        ->where('state', IEventStates::STATE_ACCEPTED)
         ->where('date', '>', date('Y-m-d H:i:s'))
         ->orderBy('events.date', 'asc')
         ->get();
@@ -385,7 +385,7 @@ class EventsController extends Controller
             })
             ->where('state', IEventStates::STATE_ACCEPTED)
             ->where('date', '<', date('Y-m-d H:i:s'))
-            ->orderBy('events.date', 'asc')
+            ->orderBy('events.date', 'desc')
             ->get();
 
         return response()->json([

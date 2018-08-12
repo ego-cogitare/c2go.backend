@@ -19,6 +19,6 @@ class VoteLived
 {
     public function handle(UserReview $userReview)
     {
-        
+
     }
 }
