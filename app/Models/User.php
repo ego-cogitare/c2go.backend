@@ -3,6 +3,7 @@
 namespace App\Models;
 
 
+use App\Interfaces\IUserSettings;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Hash;
@@ -18,12 +19,18 @@ class User extends Authenticatable
     use SoftDeletes;
 
     /**
+     * @var array|null
+     */
+    private $userSettings = null;
+
+    /**
      * @var array
      */
     protected $appends = [
-        'age', 
+        'settings',
+        'age',
+        'birth_date',
         'rank',
-        'settings'
     ];
 
     /**
@@ -35,13 +42,6 @@ class User extends Authenticatable
         'password',
         'first_name',
         'last_name',
-        'home_address',
-        'birth_date',
-        'progress',
-        'is_subscribed',
-        'android_device_token',
-        'ios_device_token',
-        'is_blocked'
     ];
 
     /**
@@ -51,7 +51,20 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 
         'remember_token',
+        'created_at',
+        'updated_at',
+        'deleted_at',
     ];
+
+    /**
+     * @return int
+     */
+    public function getProgressAttribute()
+    {
+        $settings = $this->getUserSettings();
+
+        return $settings[IUserSettings::PROFILE_REGISTRATION_PROGRESS];
+    }
 
 
     /**
@@ -59,7 +72,20 @@ class User extends Authenticatable
      */
     public function getAgeAttribute() 
     {
-        return Carbon::parse($this->attributes['birth_date'])->age;
+        $settings = $this->getUserSettings();
+
+        return Carbon::parse($settings[IUserSettings::PROFILE_BIRTH_DATE])->age;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getBirthDateAttribute()
+    {
+        $settings = $this->getUserSettings();
+
+        return Carbon::parse($settings[IUserSettings::PROFILE_BIRTH_DATE])->format('d.m.Y');
     }
 
 
@@ -108,24 +134,60 @@ class User extends Authenticatable
         return $this->first_name . ' ' . $this->last_name;
     }
 
-
-    /**
-     * @param string $value
-     */
-    public function setBirthDateAttribute($value)
-    {
-        $this->attributes['birth_date'] = Carbon::createFromFormat('d.m.Y', $value)->format('Y-m-d');
-    }
-
     
     /**
      * Get user settings
      */
     protected function getUserSettings()
     {
-        return UserSetting::where('user_id', $this->id)
+        if ($this->userSettings !== null) {
+            return $this->userSettings;
+        }
+
+        $settings = UserSetting::where('user_id', $this->id)
             ->get()
             ->pluck('value', 'section');
+
+        foreach ($settings as $section => $value) {
+            switch ($section) {
+                case 'profile_settings':
+                    $settings[$section] = [];
+                    break;
+
+                case 'profile_interests':
+                    $data = json_decode($value);
+
+                    if (!empty($data->categories)) {
+                        $settings[$section] = Category::with([
+                            'categories' => function($query) use ($data) {
+                                $query->whereIn('id', $data->categories);
+                            }
+                        ])
+                        ->where('is_active', 1)
+                        ->whereNull('parent_id')
+                        ->orderBy('order', 'ASC')
+                        ->get()
+                        ->toArray();
+                    }
+                    break;
+
+                default:
+                    $settings[$section] = json_decode($value);
+                    if (in_array($settings[$section], ['', null], true)) {
+                        $settings[$section] = $value;
+                    }
+                    break;
+            }
+        }
+
+        /** Mock with required fields */
+        $this->userSettings = array_merge(
+            UserSettings::settingSections(),
+            ['profile_interests' => []],
+            $settings->toArray()
+        );
+
+        return $this->userSettings;
     }
 
 
@@ -136,50 +198,7 @@ class User extends Authenticatable
      */
     public function getSettingsAttribute() 
     {
-        /** @var array $settings */
-        $settings = $this->getUserSettings();
-
-        foreach ($settings as $section => $value) {
-            switch ($section) {
-                case 'location':
-                    $settings[$section] = json_decode($value);
-                    break;
-                
-                case 'profile_settings':
-                    $settings[$section] = [];
-                    break;
-            
-                case 'profile_interests':
-                    $data = json_decode($value);
-
-                    if (!empty($data->categories)) {
-                        $settings[$section] = Category::with([
-                                'categories' => function($query) use ($data) {
-                                    $query->whereIn('id', $data->categories);
-                                }
-                            ])
-                            ->where('is_active', 1)
-                            ->whereNull('parent_id')
-                            ->orderBy('order', 'ASC')
-                            ->get()
-                            ->toArray();
-                    }
-                    break;
-                    
-                case 'phone':
-                    $settings[$section] = $value;
-                    break;
-            }
-        }
-        
-        /** Mock with required fields */
-        $settings = array_merge(
-            UserSettings::settingSections(),
-            ['profile_interests' => []],
-            $settings->toArray()
-        );
-        
-        return $settings;
+        return $this->getUserSettings();
     }
 
     
@@ -251,8 +270,6 @@ class User extends Authenticatable
      */
     public function getAccountType()
     {
-        $settings = $this->getUserSettings();
-        
-        return (int)$settings['profile_type'] ?? null;
+        return (int)$this->userSettings['profile_type'] ?? null;
     }
 }

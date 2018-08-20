@@ -10,10 +10,25 @@ namespace App\Interfaces;
 interface IUserSettings
 {
     /** @var string */
+    const PROFILE_REGISTRATION_PROGRESS = 'profile_registration_progress';
+
+    /** @var string */
     const PROFILE_PHOTO = 'profile_photo';
 
     /** @var string */
-    const PROFILE_HOME_LOCATION = 'location';
+    const PROFILE_BIRTH_DATE = 'profile_birth_date';
+
+    /** @var string */
+    const PROFILE_IS_SUBSCRIBED = 'profile_is_subscribed';
+
+    /** @var string */
+    const PROFILE_HOME_ADDRESS_LAT_LNG = 'profile_home_address_lat_lng';
+
+    /** @var string */
+    const PROFILE_HOME_ADDRESS_FRIENDLY = 'profile_home_address_friendly';
+
+    /** @var string */
+    const PROFILE_HOME_POSTCODE = 'profile_home_postcode';
 
     /** @var array */
     const PROFILE_INTERESTS = 'profile_interests';
@@ -22,7 +37,7 @@ interface IUserSettings
     const PROFILE_TYPE = 'profile_type';
 
     /** @var string */
-    const PROFILE_PHONE = 'phone';
+    const PROFILE_PHONE = 'profile_phone';
 
     /** @var string */
     const PROFILE_SETTINGS_GENERAL = 'profile_settings';

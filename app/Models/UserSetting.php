@@ -64,6 +64,31 @@ class UserSetting extends Model
 
 
     /**
+     * @param $section
+     * @param null $user_id
+     * @return mixed
+     * @throws WrongSettingsException
+     * @throws \ReflectionException
+     */
+    public static function get($section, $user_id = null)
+    {
+        if ($user_id === null) {
+            $user_id = Auth::user()->id;
+        }
+
+        if (UserSettingsBase::isSectionValid($section) === false) {
+            throw new WrongSettingsException('Illegal settings section.');
+        }
+
+        return self::where([
+            'section' => $section,
+            'user_id' => $user_id,
+        ])
+        ->pluck('value');
+    }
+
+
+    /**
      * @param int|null $user_id
      * @param string $location
      * @return mixed

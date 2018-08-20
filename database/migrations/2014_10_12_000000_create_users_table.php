@@ -18,13 +18,8 @@ class CreateUsersTable extends Migration
             $table->char('first_name', 255);
             $table->char('last_name', 255);
             $table->string('email')->unique();
-            $table->boolean('verified')->default(false);
             $table->string('password');
             $table->boolean('is_blocked')->default(false);
-            $table->string('home_address')->nullable();
-            $table->date('birth_date')->nullable();
-            $table->boolean('is_subscribed')->default(0);
-            $table->unsignedTinyInteger('progress')->nullable();
             $table->softDeletes();
             $table->rememberToken();
             $table->timestamps();
