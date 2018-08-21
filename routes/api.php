@@ -62,6 +62,7 @@ Route::group(['namespace' => 'Api'], function () {
             Route::post('/disability-information', 'UserController@updateDisabilityInfo');
             Route::post('/require-assistance', 'UserController@updateRequireAssistance');
             Route::post('/update-setting', 'UserController@updateSettingSection');
+            Route::post('/update-settings', 'UserController@updateSettings');
 
             /** Live vote after event */
             Route::post('/vote/{requestId}', 'UserController@storeVote');

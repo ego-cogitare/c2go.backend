@@ -224,6 +224,53 @@ class UserController extends Controller
 
 
     /**
+     * @param Requests\UpdateSettingsRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws WrongSettingsException
+     * @throws \ReflectionException
+     */
+    public function updateSettings(Requests\UpdateSettingsRequest $request)
+    {
+        /** Update home latitude and longtitude */
+        if (!empty($request->input('home_address_latlng'))) {
+            UserSetting::apply(
+                IUserSettings::PROFILE_HOME_ADDRESS_LAT_LNG,
+                json_encode($request->input('home_address_latlng'))
+            );
+        }
+
+        /** Update user birth date */
+        UserSetting::apply(
+            IUserSettings::PROFILE_BIRTH_DATE,
+            $request->input('birth_date')
+        );
+
+        /** Update user friendly home address */
+        UserSetting::apply(
+            IUserSettings::PROFILE_HOME_ADDRESS_FRIENDLY,
+            $request->input('home_address')
+        );
+
+        /** Update user postcode */
+        UserSetting::apply(
+            IUserSettings::PROFILE_HOME_POSTCODE,
+            $request->input('postcode')
+        );
+
+        /** Update first and last name */
+        Auth::user()->update([
+            'first_name' => $request->input('first_name'),
+            'last_name' => $request->input('last_name'),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Settings updated',
+        ]);
+    }
+
+
+    /**
      * @param Requests\VoteRequest $request
      * @param $requestId
      * @return \Illuminate\Http\JsonResponse

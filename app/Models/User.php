@@ -79,7 +79,7 @@ class User extends Authenticatable
 
 
     /**
-     * @return int
+     * @return string
      */
     public function getBirthDateAttribute()
     {
