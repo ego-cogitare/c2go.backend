@@ -8,9 +8,9 @@
 
 namespace App\Classes;
 
+
 use App\Interfaces\IUserSettings;
 use App\Traits\ReflectionTrait;
-
 
 /**
  * Class UserSettingsBase

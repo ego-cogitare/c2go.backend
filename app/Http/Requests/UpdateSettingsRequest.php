@@ -3,6 +3,10 @@
 namespace App\Http\Requests;
 
 
+/**
+ * Class UpdateSettingsRequest
+ * @package App\Http\Requests
+ */
 class UpdateSettingsRequest extends Request
 {
     /**

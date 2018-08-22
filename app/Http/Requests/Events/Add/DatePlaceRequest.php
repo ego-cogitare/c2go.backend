@@ -2,8 +2,11 @@
 
 namespace App\Http\Requests\Events\Add;
 
-use App\Http\Requests\Request;
 
+/**
+ * Class DatePlaceRequest
+ * @package App\Http\Requests\Events\Add
+ */
 class DatePlaceRequest extends Request
 {
     /**
