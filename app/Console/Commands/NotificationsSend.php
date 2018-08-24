@@ -45,14 +45,14 @@ class NotificationsSend extends Command
                 'email' => 'ego.cogitare@gmail.com',
                 'name' => 'Alexander Vyacheslavovich',
             ])
-            ->setTitle('Message title')
-            ->setMessage('Message body')
+            ->setTitle('Вы приглашены на событие')
+            ->setMessage('Пользователь приглашает вас посетить событие')
             ->send();
 
         /** Send email using custom layout */
         $sender
             ->setAddressee([
-                'email' => 'ego.cogitare@gmail.com',
+                'email' => 'ego.cogitare@yahoo.com',
                 'name' => 'Alexander Vyacheslavovich',
             ])
             ->setTitle('Message title HTML')

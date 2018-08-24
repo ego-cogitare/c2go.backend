@@ -10,6 +10,7 @@ namespace App\Classes;
 
 
 use App\Interfaces\INotificationTypes;
+use Exception;
 use Mail;
 
 /**
@@ -37,6 +38,10 @@ class NotificationSenderEmail extends NotificationSenderBase
 
         /** @var mixed $message */
         $message = $this->getMessage();
+
+        if (!is_array($addressee) || !filter_var($addressee['email'], FILTER_VALIDATE_EMAIL) || empty($addressee['name'])) {
+            throw new Exception(sprintf('Wrong addressee %s', json_encode($addressee)));
+        }
 
         /** Custom html email */
         if (is_array($message)) {
