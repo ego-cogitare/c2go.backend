@@ -23,17 +23,17 @@ abstract class NotificationSenderBase
     private $title = '';
 
     /**
-     * @var string
+     * @var mixed
      */
     private $message = '';
 
     /**
-     * @var string
+     * @var mixed
      */
     private $addressee = '';
 
     /**
-     * @var null
+     * @var null|int|INotificationTypes
      */
     protected $notificationType = null;
 
@@ -59,10 +59,10 @@ abstract class NotificationSenderBase
 
 
     /**
-     * @param string $message
+     * @param mixed $message
      * @return static
      */
-    public function setMessage(string $message)
+    public function setMessage($message)
     {
         $this->message = $message;
 
@@ -71,19 +71,19 @@ abstract class NotificationSenderBase
 
 
     /**
-     * @return string
+     * @return mixed
      */
-    public function getMessage(): string
+    public function getMessage()
     {
         return $this->message;
     }
 
 
     /**
-     * @param string $addressee
+     * @param mixed $addressee
      * @return static
      */
-    public function setAddressee(string $addressee)
+    public function setAddressee($addressee)
     {
         $this->addressee = $addressee;
 
@@ -92,9 +92,9 @@ abstract class NotificationSenderBase
 
 
     /**
-     * @return string
+     * @return mixed
      */
-    public function getAddressee(): string
+    public function getAddressee()
     {
         return $this->addressee;
     }

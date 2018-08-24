@@ -10,6 +10,7 @@ namespace App\Classes;
 
 
 use App\Interfaces\INotificationTypes;
+use Mail;
 
 /**
  * Class NotificationSenderEmail
@@ -31,6 +32,26 @@ class NotificationSenderEmail extends NotificationSenderBase
      */
     public function send()
     {
-        echo 'Send via email';
+        /** @var array $addressee */
+        $addressee = $this->getAddressee();
+
+        /** @var mixed $message */
+        $message = $this->getMessage();
+
+        /** Custom html email */
+        if (is_array($message)) {
+            Mail::send($message['template'], $message['data'], function($message) use ($addressee) {
+                $message
+                    ->to($addressee['email'], $addressee['name'])
+                    ->subject($this->getTitle());
+            });
+        /** Raw email */
+        } else {
+            Mail::raw($this->getMessage(), function($message) use ($addressee) {
+                $message
+                    ->to($addressee['email'], $addressee['name'])
+                    ->subject($this->getTitle());
+            });
+        }
     }
 }

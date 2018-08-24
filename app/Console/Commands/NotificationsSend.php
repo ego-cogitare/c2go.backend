@@ -9,6 +9,7 @@ use App\Interfaces\INotificationTypes;
 use App\Classes\{
     NotificationSenderEmail, NotificationSenderSms, NotificationSenderPush
 };
+use Mail;
 
 /**
  * Class PermissionAssignRole
@@ -38,10 +39,29 @@ class NotificationsSend extends Command
         /** @var NotificationSenderEmail|NotificationSenderSms|NotificationSenderPush $sender */
         $sender = NotificationSender::getInstance(INotificationTypes::EMAIL);
 
+        /** Send raw email */
         $sender
+            ->setAddressee([
+                'email' => 'ego.cogitare@gmail.com',
+                'name' => 'Alexander Vyacheslavovich',
+            ])
             ->setTitle('Message title')
             ->setMessage('Message body')
-            ->setAddressee('ego.cogitare@gmail.com')
+            ->send();
+
+        /** Send email using custom layout */
+        $sender
+            ->setAddressee([
+                'email' => 'ego.cogitare@gmail.com',
+                'name' => 'Alexander Vyacheslavovich',
+            ])
+            ->setTitle('Message title HTML')
+            ->setMessage([
+                'template' => 'emails.index',
+                'data' => [
+                    'firstname' => 'Custom html firstname'
+                ]
+            ])
             ->send();
     }
 }
