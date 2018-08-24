@@ -4,12 +4,8 @@ namespace App\Console\Commands;
 
 
 use Illuminate\Console\Command;
-use App\Components\NotificationSender;
 use App\Interfaces\INotificationTypes;
-use App\Classes\{
-    NotificationSenderEmail, NotificationSenderSms, NotificationSenderPush
-};
-use Mail;
+use App\Jobs\ProcessNotifications;
 
 /**
  * Class PermissionAssignRole
@@ -31,37 +27,23 @@ class NotificationsSend extends Command
 
     /**
      * Execute the console command.
-     * @throws \ReflectionException
-     * @throws \Exception
      */
     public function handle()
     {
-        /** @var NotificationSenderEmail|NotificationSenderSms|NotificationSenderPush $sender */
-        $sender = NotificationSender::getInstance(INotificationTypes::EMAIL);
-
-        /** Send raw email */
-        $sender
-            ->setAddressee([
+        ProcessNotifications::dispatch([
+            'type' => INotificationTypes::EMAIL,
+            'addressee' => [
                 'email' => 'ego.cogitare@gmail.com',
-                'name' => 'Alexander Vyacheslavovich',
-            ])
-            ->setTitle('Вы приглашены на событие')
-            ->setMessage('Пользователь приглашает вас посетить событие')
-            ->send();
-
-        /** Send email using custom layout */
-        $sender
-            ->setAddressee([
-                'email' => 'ego.cogitare@yahoo.com',
-                'name' => 'Alexander Vyacheslavovich',
-            ])
-            ->setTitle('Message title HTML')
-            ->setMessage([
+                'name' => 'Alexander Bogish',
+            ],
+            'title' => 'Notification title',
+            'message' => [
                 'template' => 'emails.index',
                 'data' => [
                     'firstname' => 'Custom html firstname'
                 ]
-            ])
-            ->send();
+            ],
+        ])
+        ->onQueue('emails');
     }
 }
