@@ -15,6 +15,7 @@ use App\Interfaces\IState;
 use Illuminate\Support\Facades\Auth;
 use App\Models\EventRequest;
 use App\Models\EventProposal;
+use Event as EventDispatcher;
 use DB;
 
 /**
@@ -67,5 +68,8 @@ class EventAccept
             ]);
 
         DB::commit();
+
+        /** Broadcast notification send event */
+        EventDispatcher::fire('event.accept.notification', $eventRequest);
     }
 }

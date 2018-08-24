@@ -2,8 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
+
+/**
+ * Class Event
+ * @package App\Models
+ */
 class Event extends Model
 {
     /**
@@ -30,27 +36,42 @@ class Event extends Model
     protected $appends = [
         'proposals_count'
     ];
-    
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function category() 
     {
         return $this->belongsTo('App\Models\Category');
     }
-    
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function user() 
     {
         return $this->belongsTo('App\Models\User');
     }
-    
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function bestProposal() 
     {
         return $this->hasOne('App\Models\EventProposal')->orderBy('price', 'ASC');
     }
-    
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function proposals() 
     {
         return $this->hasMany('App\Models\EventProposal');
     }
-    
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function requests() 
     {
         return $this->hasMany('App\Models\EventRequest');
@@ -63,7 +84,7 @@ class Event extends Model
      */
     public function getDateAttribute($value)
     {
-        return \Carbon\Carbon::parse($value)->format(env('DATETIME_FORMAT'));
+        return Carbon::parse($value)->format('d.m.Y H:i');
     }
     
     /**

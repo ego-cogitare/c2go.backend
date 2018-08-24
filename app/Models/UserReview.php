@@ -25,7 +25,7 @@ class UserReview extends Model
     ];
 
     /**
-     * Get user which review was written about
+     * Get user about review was written
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function userAbout() 

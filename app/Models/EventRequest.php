@@ -22,11 +22,11 @@ class EventRequest extends Model
         'state',
         'is_active',
     ];
-    
+
     /**
      * Author of the request
      */
-    public function user() 
+    public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id');
     }
@@ -34,13 +34,13 @@ class EventRequest extends Model
     /**
      * Author of the request
      */
-    public function requestor() 
+    public function requestor()
     {
         return $this->belongsTo('App\Models\User', 'requestor_user_id');
     }
     
     /**
-     * Author of the request
+     * Author of the proposal
      */
     public function proposal() 
     {

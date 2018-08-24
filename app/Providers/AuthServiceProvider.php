@@ -12,6 +12,7 @@ use App\Models\EventRequest;
 use App\Models\User;
 use App\Models\UserReview;
 use Carbon\Carbon;
+use Exception;
 
 /**
  * Class AuthServiceProvider
@@ -29,7 +30,8 @@ class AuthServiceProvider extends ServiceProvider
 
     /**
      * Register any authentication / authorization services.
-     * @return void
+     * @return boolean
+     * @throws Exception
      */
     public function boot()
     {
@@ -39,6 +41,11 @@ class AuthServiceProvider extends ServiceProvider
          * Check if user has permissions to live vote after event
          */
         Gate::define('vote:write', function (User $user, EventRequest $eventRequest) {
+            /** If user account type not defined */
+            if (!in_array($user->getAccountType(), [IAccountType::DISABLED, IAccountType::NORMAL], true)) {
+                throw new Exception('Unsupported user account type');
+            }
+
             /** Check if event request was accepted */
             if ($eventRequest === null || $eventRequest->state !== IEventStates::STATE_ACCEPTED) {
                 return false;

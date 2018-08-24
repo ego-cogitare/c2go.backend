@@ -13,6 +13,7 @@ use App\Interfaces\IEventStates;
 use App\Interfaces\IAccountType;
 use Illuminate\Support\Facades\Auth;
 use App\Models\EventRequest;
+use Event as EventDispatcher;
 
 /**
  * Class EventReject
@@ -20,6 +21,10 @@ use App\Models\EventRequest;
  */
 class EventReject
 {
+    /**
+     * @param EventRequest $eventRequest
+     * @throws \Exception
+     */
     public function handle(EventRequest $eventRequest)
     {
         if (Auth::user()->getAccountType() !== IAccountType::DISABLED) {
@@ -30,5 +35,8 @@ class EventReject
         $eventRequest->update([
             'state' => IEventStates::STATE_REJECTED
         ]);
+
+        /** Broadcast notification send event */
+        EventDispatcher::fire('event.reject.notification', $eventRequest);
     }
 }

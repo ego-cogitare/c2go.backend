@@ -270,6 +270,8 @@ class User extends Authenticatable
      */
     public function getAccountType()
     {
-        return (int)$this->userSettings['profile_type'] ?? null;
+        $settings = $this->getUserSettings();
+
+        return (int)$settings['profile_type'] ?? null;
     }
 }

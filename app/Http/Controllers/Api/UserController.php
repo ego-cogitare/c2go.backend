@@ -291,7 +291,7 @@ class UserController extends Controller
         }
 
         /**
-         * Check if user has anought right to vote on this event request
+         * Check if user has anought rights to vote on this event request
          * @var array|bool $reviewGate
          */
         if (Gate::allows('vote:write', $eventRequest)) {
