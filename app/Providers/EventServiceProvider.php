@@ -10,7 +10,8 @@ use \App\Listeners\ {
     EventReject,
     Notifications\EventAccept as EventAcceptNotification,
     Notifications\EventReject as EventRejectNotification,
-    VoteLived
+    VoteLived,
+    EmailChange
 };
 
 /**
@@ -30,5 +31,6 @@ class EventServiceProvider extends ServiceProvider
         Event::listen('event.reject', EventReject::class);
         Event::listen('event.reject.notification', EventRejectNotification::class);
         Event::listen('vote.lived', VoteLived::class);
+        Event::listen('email.change', EmailChange::class);
     }
 }

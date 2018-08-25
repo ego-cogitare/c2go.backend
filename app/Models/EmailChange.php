@@ -6,10 +6,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class EventProposal
+ * Class EmailChange
  * @package App\Models
  */
-class EventProposal extends Model
+class EmailChange extends Model
 {
     /**
      * The attributes that should be hidden for arrays.
@@ -25,26 +25,23 @@ class EventProposal extends Model
      * @var array
      */
     protected $fillable = [
-        'event_id', 
-        'user_id', 
-        'price', 
-        'message', 
+        'user_id',
+        'email',
+        'hash',
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @var string
      */
-    public function event() 
-    {
-        return $this->belongsTo('App\Models\Event');
-    }
+    protected $table = 'email_change';
 
 
     /**
+     * Get user
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user() 
+    public function user()
     {
-        return $this->belongsTo('App\Models\User', 'user_id');
+        return $this->belongsTo('App\Models\User', 'user_id', 'id');
     }
 }

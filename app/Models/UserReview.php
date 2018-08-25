@@ -12,6 +12,15 @@ use Illuminate\Database\Eloquent\Model;
 class UserReview extends Model
 {
     /**
+     * The attributes that should be hidden for arrays.
+     * @var array
+     */
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
+    /**
      * Attributes that should be mass-assignable.
      * @var array
      */

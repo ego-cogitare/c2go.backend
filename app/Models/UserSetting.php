@@ -16,6 +16,15 @@ use Illuminate\Support\Facades\Auth;
 class UserSetting extends Model
 {
     /**
+     * The attributes that should be hidden for arrays.
+     * @var array
+     */
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
+    /**
      * Attributes that should be mass-assignable.
      * @var array
      */

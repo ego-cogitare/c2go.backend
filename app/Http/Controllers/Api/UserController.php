@@ -150,7 +150,29 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Password changed'
+            'data' => 'Password changed'
+        ]);
+    }
+
+
+    /**
+     * @param Requests\ChangeEmailRequest $request
+     * @param string|null $hash
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
+    public function changeEmail(Requests\ChangeEmailRequest $request, $hash = null)
+    {
+        $request->request->add([
+            'hash' => $hash
+        ]);
+
+        /** Broadcast email change event (to send notifications) */
+        $result = EventDispatcher::fire('email.change', [$request->all()]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $result[0]
         ]);
     }
 

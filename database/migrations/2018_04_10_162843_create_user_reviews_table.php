@@ -23,7 +23,7 @@ class CreateUserReviewsTable extends Migration
             $table->string('message', 255);
             $table->unsignedTinyInteger('is_active')->default(1);
             $table->foreign('user_about_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('event_id')->references('id')->on('event')->onDelete('cascade');
+            $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }

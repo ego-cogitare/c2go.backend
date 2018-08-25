@@ -28,6 +28,8 @@ Route::group(['namespace' => 'Api'], function () {
         Route::get('/general/{proposal}', 'EventsController@general');
         Route::get('/autocomplete', 'EventsController@autocomplete');
     });
+    Route::post('/user/change-email/{hash}', 'UserController@changeEmail');
+
 
     Route::group(['prefix' => 'auth'], function() {
         Route::post('/login', 'AuthController@login')->name('auth_login');
@@ -59,6 +61,7 @@ Route::group(['namespace' => 'Api'], function () {
             Route::post('/profile-photo', 'UserController@profilePhoto');
             Route::post('/deactivate', 'UserController@deactivate');
             Route::post('/change-password', 'UserController@changePassword');
+            Route::post('/change-email', 'UserController@changeEmail');
             Route::post('/disability-information', 'UserController@updateDisabilityInfo');
             Route::post('/require-assistance', 'UserController@updateRequireAssistance');
             Route::post('/update-setting', 'UserController@updateSettingSection');

@@ -9,10 +9,18 @@ class EventRequest extends Model
     const STATE_NEW = 1;
     const STATE_ACCEPTED = 2;
     const STATE_REJECTED = 3;
+
+    /**
+     * The attributes that should be hidden for arrays.
+     * @var array
+     */
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
     
     /**
      * Attributes that should be mass-assignable.
-     *
      * @var array
      */
     protected $fillable = [
