@@ -79,10 +79,10 @@ class EventsController extends Controller
                 !empty($category_id) && $events->whereIn('category_id', $categories);
                 
                 // Filter by event location
-                !empty($location) && $events->where('event_location_human', 'LIKE', $location);
+                !empty($location) && $events->where('destination', 'LIKE', $location);
                 
                 // Filter by destination location only for "Reise" category
-                !empty($destination) && in_array($category_id, self::RIDE_CATEGORY_IDS) && $events->where('event_destination_human', $destination);
+                !empty($destination) && in_array($category_id, self::RIDE_CATEGORY_IDS) && $events->where('dispatch', $destination);
             }
             
             $events = $events->orderBy('date', 'ASC')->get();
