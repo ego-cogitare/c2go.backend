@@ -65,6 +65,9 @@ interface IUserSettings
 
     /** @var string */
     const NOTIFY_REMINDER_SMS = 'notify_reminder_sms';
+
+    /** @var string */
+    const FCM_PUSH_NOTIFICATION_TOKEN = 'fcm_push_notification_token';
 }
 
 

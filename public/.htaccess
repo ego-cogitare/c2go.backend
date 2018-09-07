@@ -21,8 +21,9 @@
 </IfModule>
 
 <IfModule mod_headers.c>
-    Header set Access-Control-Allow-Credentials true
+    SetEnvIf Origin "^http(s)?://(c2go\.com|c2go\.itsm\.comodo\.od\.ua)(:8000)?$" origin_is=$0
+    Header set Access-Control-Allow-Origin %{origin_is}e env=origin_is
     Header set Access-Control-Allow-Headers "Authorization"
     Header set Access-Control-Allow-Methods "POST, GET, OPTIONS, DELETE, PUT"
-    Header set Access-Control-Allow-Origin http://c2go.com:8000
+    Header set Access-Control-Allow-Credentials true
 </IfModule>
