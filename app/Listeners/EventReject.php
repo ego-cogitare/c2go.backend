@@ -32,9 +32,9 @@ class EventReject
         }
 
         /** Mark event request as rejected */
-        $eventRequest->update([
-            'state' => IEventStates::STATE_REJECTED
-        ]);
+//        $eventRequest->update([
+//            'state' => IEventStates::STATE_REJECTED
+//        ]);
 
         /** Broadcast notification send event */
         EventDispatcher::fire('event.reject.notification', $eventRequest);

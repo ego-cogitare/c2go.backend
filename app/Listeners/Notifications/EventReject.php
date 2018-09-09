@@ -13,6 +13,7 @@ use App\Models\EventRequest;
 use App\Interfaces\INotificationTypes;
 use App\Jobs\ProcessNotifications;
 use App\Factories\NotificationSenderFactory;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class EventReject
@@ -54,7 +55,7 @@ class EventReject
                     ])
                     ->onQueue('emails');
 
-                    /** Send notification to current user (who accept request - disable human) */
+                    /** Send notification to current user (who accept request - disabled human) */
                     ProcessNotifications::dispatch([
                         'type' => INotificationTypes::EMAIL,
                         'addressee' => [
@@ -77,10 +78,17 @@ class EventReject
                     ->onQueue('emails');
                     break;
 
-                case INotificationTypes::SMS:
+                case INotificationTypes::PUSH:
+                    ProcessNotifications::dispatch([
+                        'type' => INotificationTypes::PUSH,
+                        'addressee' => Auth::user()->id,
+                        'title' => 'C2Go::Event rejected',
+                        'message' => 'User reject your event request',
+                    ])
+                    ->onQueue('push');
                     break;
 
-                case INotificationTypes::PUSH:
+                case INotificationTypes::SMS:
                     break;
             }
         }

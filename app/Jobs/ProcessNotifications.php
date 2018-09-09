@@ -15,7 +15,7 @@ use App\Classes\{
 
 /**
  * Class ProcessNotifications
- * How to use: `php artisan queue:work --queue=emails --tries=5`
+ * How to use: `php artisan queue:work --queue=emails|push|sms --tries=5`
  * @package App\Jobs
  */
 class ProcessNotifications implements ShouldQueue
