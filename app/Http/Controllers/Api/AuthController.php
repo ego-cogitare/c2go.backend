@@ -142,14 +142,6 @@ class AuthController extends Controller
         $user->password = $password;
         $user->save();
         try {
-            /**
-             * @todo Send email here
-             */
-            /*
-            Mail::send('emails.forgot', array('password' => $password), function ($message) use ($user) {
-                $message->to($user->email, $user->first_name . ' ' . $user->last_name)->subject('Forgot password');
-            });
-            */
             $status = true;
         } catch (\Exception $ex) {
             Log::error($ex);
