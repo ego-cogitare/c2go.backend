@@ -1,0 +1,11 @@
+[program:c2go_notifications]
+command=php artisan queue:work --queue=emails --tries=5
+process_name=%(program_name)s_%(process_num)02d
+directory=/var/www/c2go/admin.api.backend
+autostart=true
+autorestart=true
+startretries=999999999999
+user=ubuntu
+numprocs=1
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/worker_%(program_name)s.log
